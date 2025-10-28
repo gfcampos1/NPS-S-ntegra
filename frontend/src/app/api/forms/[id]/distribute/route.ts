@@ -66,8 +66,7 @@ export async function POST(
               formId: params.id,
               respondentId: respondentId,
               uniqueToken: token,
-              status: 'PENDING',
-              answers: {},
+              status: 'IN_PROGRESS',
             },
             include: {
               respondent: {
