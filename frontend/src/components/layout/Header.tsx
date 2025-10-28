@@ -51,7 +51,7 @@ export function Header({ title, subtitle }: HeaderProps) {
   const pageInfo = getPageInfo();
 
   return (
-    <div className="bg-gradient-to-r from-primary-800 via-primary-700 to-primary-600 shadow-lg">
+    <div className="bg-gradient-to-r from-primary-600 via-primary-700 to-primary-800 shadow-lg">
       <div className="px-6 py-6">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center">
