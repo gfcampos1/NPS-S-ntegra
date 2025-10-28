@@ -28,10 +28,10 @@ git commit -m "feat: Sistema NPS Síntegra - implementação completa"
 
 ```powershell
 # Adicionar remote (seu repositório já existe)
-git remote add origin https://github.com/gfcampos1/NPS-Sintegra.git
+git remote add origin https://github.com/gfcampos1/NPS-S-ntegra.git
 
 # Ou se já tem remote configurado
-git remote set-url origin https://github.com/gfcampos1/NPS-Sintegra.git
+git remote set-url origin https://github.com/gfcampos1/NPS-S-ntegra.git
 
 # Fazer push
 git branch -M main
@@ -45,7 +45,7 @@ git push -u origin main
 2. Login com GitHub
 3. Clique em "New Project"
 4. Selecione "Deploy from GitHub repo"
-5. Escolha: `gfcampos1/NPS-Sintegra`
+5. Escolha: `gfcampos1/NPS-S-ntegra`
 
 ### Adicionar PostgreSQL
 1. No mesmo projeto, clique "+ New"

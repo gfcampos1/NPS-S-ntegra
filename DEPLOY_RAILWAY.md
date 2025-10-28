@@ -36,7 +36,7 @@ git commit -m "feat: Sistema NPS Síntegra - implementação inicial"
 
 ```powershell
 # Adicionar remote (substitua SEU_USUARIO pelo seu usuário GitHub)
-git remote add origin https://github.com/gfcampos1/NPS-Sintegra.git
+git remote add origin https://github.com/gfcampos1/NPS-S-ntegra.git
 
 # Renomear branch para main
 git branch -M main
@@ -60,7 +60,7 @@ git push -u origin main
 
 1. Clique em **"New Project"**
 2. Selecione **"Deploy from GitHub repo"**
-3. Selecione o repositório: `gfcampos1/NPS-Sintegra`
+3. Selecione o repositório: `gfcampos1/NPS-S-ntegra`
 4. Railway vai começar a detectar o projeto
 
 ### 2.3 Adicionar PostgreSQL
