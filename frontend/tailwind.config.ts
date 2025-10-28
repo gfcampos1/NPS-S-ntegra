@@ -17,27 +17,43 @@ module.exports = {
     },
     extend: {
       colors: {
-        // Cores da marca Síntegra
-        sintegra: {
-          blue: {
-            light: '#5BA4D9',
-            DEFAULT: '#4169B1',
-            dark: '#2E4A8F',
-          },
-          gray: {
-            light: '#A8A8A8',
-            medium: '#6B6B6B',
-            dark: '#3D3D3D',
-          },
+        // Paleta Síntegra - Baseada na identidade visual
+        primary: {
+          50: '#e8f7fd',   // Azul muito claro
+          100: '#c9edfb',  // Azul claro suave
+          200: '#9de2f9',  // Azul claro
+          300: '#6dd5f6',  // Azul claro vibrante
+          400: '#4dc9f3',  // Azul céu
+          500: '#4DB5E8',  // Azul Síntegra principal (do logo)
+          600: '#1E9FD8',  // Azul médio
+          700: '#1789be',  // Azul médio escuro
+          800: '#2B5C9E',  // Azul corporativo (do logo)
+          900: '#1e4177',  // Azul escuro
         },
-        
+        secondary: {
+          50: '#f5f5f5',   // Cinza muito claro
+          100: '#e5e5e5',  // Cinza claro
+          200: '#d4d4d4',  // Cinza médio claro
+          300: '#a3a3a3',  // Cinza médio
+          400: '#A8A8A8',  // Cinza Síntegra (do logo)
+          500: '#737373',  // Cinza
+          600: '#525252',  // Cinza escuro
+          700: '#3D3D3D',  // Cinza Síntegra escuro (do logo)
+          800: '#262626',  // Cinza muito escuro
+          900: '#171717',  // Quase preto
+        },
+        // Cores de status preservadas
+        status: {
+          green: '#52c41a',
+          yellow: '#faad14',
+          red: '#ff4d4f',
+        },
         // Cores NPS
         nps: {
           promotor: '#10B981',
           neutro: '#F59E0B',
           detrator: '#EF4444',
         },
-        
         // Cores de Rating (1-5)
         rating: {
           1: '#EF4444',
@@ -45,41 +61,6 @@ module.exports = {
           3: '#F59E0B',
           4: '#84CC16',
           5: '#10B981',
-        },
-        
-        // Cores padrão do shadcn/ui
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
-        primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
-        },
-        secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
-        },
-        destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
-        },
-        muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
-        },
-        accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
-        },
-        popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
-        },
-        card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
         },
       },
       borderRadius: {
