@@ -62,6 +62,14 @@ module.exports = {
           4: '#84CC16',
           5: '#10B981',
         },
+        // Legacy color names (backward compatibility)
+        'sintegra-blue': '#4DB5E8',
+        'sintegra-blue-light': '#c9edfb',
+        'sintegra-blue-medium': '#1E9FD8',
+        'sintegra-blue-dark': '#2B5C9E',
+        'sintegra-gray-light': '#e5e5e5',
+        'sintegra-gray-medium': '#a3a3a3',
+        'sintegra-gray-dark': '#3D3D3D',
         // Cores do shadcn/ui (necessárias para componentes base)
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
