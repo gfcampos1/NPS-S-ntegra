@@ -1,5 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { DeleteFormButton } from '@/components/forms/DeleteFormButton'
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
 import { formatDistanceToNow } from 'date-fns'
@@ -57,14 +58,8 @@ export default async function FormsPage() {
   const forms = await getForms()
 
   return (
-    <div className="space-y-6">
+    <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-3xl font-bold text-sintegra-gray-dark">Formulários</h2>
-          <p className="text-sintegra-gray-medium">
-            Gerencie os formulários de pesquisa NPS
-          </p>
-        </div>
         <Link href="/admin/forms/new">
           <Button>+ Novo Formulário</Button>
         </Link>
@@ -135,6 +130,11 @@ export default async function FormsPage() {
                       Editar
                     </Button>
                   </Link>
+                  <DeleteFormButton 
+                    formId={form.id} 
+                    formTitle={form.title}
+                    hasResponses={form._count.responses > 0}
+                  />
                 </div>
               </CardContent>
             </Card>
