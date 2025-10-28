@@ -49,6 +49,7 @@ export default function NewFormPage() {
 
       const form = await response.json()
       router.push(`/admin/forms/${form.id}/edit`)
+      router.refresh()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao criar formulário')
     } finally {

@@ -49,7 +49,9 @@ export default function NewRespondentPage() {
         throw new Error(error.error || 'Erro ao criar respondente')
       }
 
+      // Redirect and refresh
       router.push('/admin/respondents')
+      router.refresh()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao criar respondente')
     } finally {

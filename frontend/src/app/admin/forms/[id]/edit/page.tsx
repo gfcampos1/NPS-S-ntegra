@@ -93,6 +93,7 @@ export default function EditFormPage({ params }: { params: { id: string } }) {
         throw new Error('Erro ao atualizar formulário')
       }
 
+      router.refresh()
       await fetchForm()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao atualizar formulário')
@@ -111,6 +112,7 @@ export default function EditFormPage({ params }: { params: { id: string } }) {
 
       if (!response.ok) throw new Error('Erro ao excluir pergunta')
       
+      router.refresh()
       await fetchForm()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao excluir pergunta')

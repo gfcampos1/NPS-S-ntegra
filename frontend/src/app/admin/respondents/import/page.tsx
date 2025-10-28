@@ -83,6 +83,11 @@ export default function ImportRespondentsPage() {
 
       const data = await response.json()
       setResult(data.results)
+      
+      // If import was successful, refresh the list
+      if (data.results.success > 0) {
+        router.refresh()
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao processar arquivo')
     } finally {

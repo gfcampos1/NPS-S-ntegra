@@ -75,17 +75,21 @@ export function QuestionBuilder({ formId, question, onClose, onSave }: QuestionB
     setError('')
 
     try {
-      // Build payload - only include options if needed
+      // Build payload - only include fields that have values
       const payload: any = {
         type: data.type,
         text: data.text,
-        description: data.description,
         required: data.required,
         order: data.order,
       }
 
+      // Add optional fields only if they have values
+      if (data.description) {
+        payload.description = data.description
+      }
+
       // Only add options if the question type needs them
-      if (needsOptions) {
+      if (needsOptions && options.length > 0) {
         payload.options = options
       }
 
@@ -94,6 +98,8 @@ export function QuestionBuilder({ formId, question, onClose, onSave }: QuestionB
         : `/api/forms/${formId}/questions`
       
       const method = question ? 'PATCH' : 'POST'
+
+      console.log('Sending payload:', payload) // Debug
 
       const response = await fetch(url, {
         method,
