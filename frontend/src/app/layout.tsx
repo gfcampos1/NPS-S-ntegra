@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import '@/styles/globals.css'
 import { Providers } from '@/components/providers'
@@ -9,10 +9,13 @@ export const metadata: Metadata = {
   title: 'Sistema NPS - Síntegra',
   description: 'Sistema de coleta de dados NPS para médicos e distribuidores',
   manifest: '/manifest.json',
-  themeColor: '#4169B1',
   icons: {
     icon: '/favicon.svg',
   },
+}
+
+export const viewport: Viewport = {
+  themeColor: '#4169B1',
 }
 
 export default function RootLayout({

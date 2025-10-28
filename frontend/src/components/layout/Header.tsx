@@ -51,26 +51,26 @@ export function Header({ title, subtitle }: HeaderProps) {
   const pageInfo = getPageInfo();
 
   return (
-    <div className="bg-gradient-to-r from-primary-600 via-primary-500 to-primary-400 shadow-brand">
-      <div className="px-6 py-8">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-            {pathname.includes('/forms') && <FileText className="w-6 h-6 text-white" />}
-            {pathname.includes('/respondents') && <Users className="w-6 h-6 text-white" />}
-            {pathname.includes('/reports') && <BarChart3 className="w-6 h-6 text-white" />}
-            {pathname.includes('/dashboard') && <LayoutDashboard className="w-6 h-6 text-white" />}
+    <div className="bg-gradient-to-r from-primary-800 via-primary-700 to-primary-600 shadow-lg">
+      <div className="px-6 py-6">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center">
+            {pathname.includes('/forms') && <FileText className="w-5 h-5 text-white" />}
+            {pathname.includes('/respondents') && <Users className="w-5 h-5 text-white" />}
+            {pathname.includes('/reports') && <BarChart3 className="w-5 h-5 text-white" />}
+            {pathname.includes('/dashboard') && <LayoutDashboard className="w-5 h-5 text-white" />}
             {!pathname.includes('/forms') && 
              !pathname.includes('/respondents') && 
              !pathname.includes('/reports') && 
              !pathname.includes('/dashboard') && (
-              <span className="text-white font-bold text-xl">S</span>
+              <span className="text-white font-bold text-lg">S</span>
             )}
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-white">
+            <h1 className="text-2xl font-bold text-white">
               {pageInfo.title}
             </h1>
-            <p className="text-primary-50 text-sm mt-1">
+            <p className="text-primary-100 text-xs mt-0.5">
               {pageInfo.subtitle}
             </p>
           </div>
