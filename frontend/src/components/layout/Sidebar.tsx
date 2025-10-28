@@ -33,12 +33,7 @@ const navItems: NavItem[] = [
   { name: "Relatórios", href: "/admin/reports", icon: BarChart3, adminOnly: true },
 ];
 
-interface SidebarProps {
-  darkMode?: boolean;
-  onToggleDarkMode?: () => void;
-}
-
-export function Sidebar({ darkMode = false, onToggleDarkMode }: SidebarProps) {
+export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const [logoError, setLogoError] = useState(false);
   const pathname = usePathname();
@@ -62,12 +57,12 @@ export function Sidebar({ darkMode = false, onToggleDarkMode }: SidebarProps) {
         transition={{ duration: 0.3, ease: "easeInOut" }}
         className={cn(
           "fixed left-0 top-0 h-screen z-40 flex flex-col",
-          "bg-white dark:bg-secondary-800 border-r border-gray-200 dark:border-secondary-700",
+          "bg-white border-r border-gray-200",
           "shadow-lg"
         )}
       >
         {/* Header */}
-        <div className="h-16 flex items-center justify-between px-4 border-b border-gray-200 dark:border-secondary-700">
+        <div className="h-16 flex items-center justify-between px-4 border-b border-gray-200">
           <AnimatePresence mode="wait">
             {!collapsed && (
               <motion.div
@@ -81,10 +76,10 @@ export function Sidebar({ darkMode = false, onToggleDarkMode }: SidebarProps) {
                   <span className="text-white font-bold text-xl">S</span>
                 </div>
                 <div>
-                  <h1 className="font-bold text-lg text-secondary-900 dark:text-white">
+                  <h1 className="font-bold text-lg text-secondary-900">
                     Síntegra
                   </h1>
-                  <p className="text-xs text-secondary-500 dark:text-secondary-400">
+                  <p className="text-xs text-secondary-500">
                     NPS System
                   </p>
                 </div>
@@ -113,10 +108,10 @@ export function Sidebar({ darkMode = false, onToggleDarkMode }: SidebarProps) {
                     href={item.href}
                     className={cn(
                       "flex items-center gap-3 px-3 py-3 rounded-lg transition-all duration-200",
-                      "hover:bg-primary-50 dark:hover:bg-secondary-700",
+                      "hover:bg-primary-50",
                       isActive
                         ? "bg-gradient-sintegra text-white shadow-md"
-                        : "text-secondary-700 dark:text-secondary-300"
+                        : "text-secondary-700"
                     )}
                   >
                     <Icon className={cn("w-5 h-5 flex-shrink-0")} />
@@ -141,14 +136,14 @@ export function Sidebar({ darkMode = false, onToggleDarkMode }: SidebarProps) {
         </nav>
 
         {/* User Profile & Settings */}
-        <div className="border-t border-gray-200 dark:border-secondary-700 p-3 space-y-2">
+        <div className="border-t border-gray-200 p-3 space-y-2">
           {/* Settings Link */}
           <Link href="/admin/settings">
             <button
               className={cn(
                 "w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all",
-                "hover:bg-secondary-100 dark:hover:bg-secondary-700",
-                "text-secondary-700 dark:text-secondary-300"
+                "hover:bg-secondary-100",
+                "text-secondary-700"
               )}
             >
               <Settings className="w-5 h-5 flex-shrink-0" />
@@ -163,7 +158,7 @@ export function Sidebar({ darkMode = false, onToggleDarkMode }: SidebarProps) {
             <div
               className={cn(
                 "flex items-center gap-3 px-3 py-2 rounded-lg",
-                "bg-secondary-50 dark:bg-secondary-700/50"
+                "bg-secondary-50"
               )}
             >
               <div className="w-8 h-8 rounded-full bg-gradient-sintegra flex items-center justify-center flex-shrink-0">
@@ -171,10 +166,10 @@ export function Sidebar({ darkMode = false, onToggleDarkMode }: SidebarProps) {
               </div>
               {!collapsed && (
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-secondary-900 dark:text-white truncate">
+                  <p className="text-sm font-semibold text-secondary-900 truncate">
                     {session.user.name}
                   </p>
-                  <p className="text-xs text-secondary-500 dark:text-secondary-400">
+                  <p className="text-xs text-secondary-500">
                     {(session.user as any).role === "SUPER_ADMIN"
                       ? "Super Admin"
                       : "Administrador"}
@@ -189,8 +184,8 @@ export function Sidebar({ darkMode = false, onToggleDarkMode }: SidebarProps) {
             onClick={handleSignOut}
             className={cn(
               "w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all",
-              "hover:bg-red-50 dark:hover:bg-red-900/20",
-              "text-red-600 dark:text-red-400"
+              "hover:bg-red-50",
+              "text-red-600"
             )}
           >
             <LogOut className="w-5 h-5 flex-shrink-0" />
@@ -203,16 +198,16 @@ export function Sidebar({ darkMode = false, onToggleDarkMode }: SidebarProps) {
           onClick={() => setCollapsed(!collapsed)}
           className={cn(
             "absolute -right-3 top-20 w-6 h-6 rounded-full",
-            "bg-white dark:bg-secondary-700 border-2 border-gray-200 dark:border-secondary-600",
+            "bg-white border-2 border-gray-200",
             "flex items-center justify-center shadow-md",
-            "hover:bg-primary-50 dark:hover:bg-primary-900/20",
+            "hover:bg-primary-50",
             "transition-colors duration-200"
           )}
         >
           {collapsed ? (
-            <ChevronRight className="w-4 h-4 text-secondary-600 dark:text-secondary-400" />
+            <ChevronRight className="w-4 h-4 text-secondary-600" />
           ) : (
-            <ChevronLeft className="w-4 h-4 text-secondary-600 dark:text-secondary-400" />
+            <ChevronLeft className="w-4 h-4 text-secondary-600" />
           )}
         </button>
       </motion.aside>

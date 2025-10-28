@@ -152,16 +152,18 @@ export default function NewRespondentPage() {
                       placeholder="Ex: Cardiologia"
                     />
                   </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="crm">CRM</Label>
-                    <Input
-                      id="crm"
-                      {...register('crm')}
-                      placeholder="Ex: 123456/SP"
-                    />
-                  </div>
                 </>
+              )}
+
+              {selectedType === 'DISTRIBUIDOR' && (
+                <div className="space-y-2">
+                  <Label htmlFor="company">Empresa</Label>
+                  <Input
+                    id="company"
+                    {...register('company')}
+                    placeholder="Ex: Distribuidora ABC"
+                  />
+                </div>
               )}
 
               <div className="space-y-2">
@@ -174,21 +176,11 @@ export default function NewRespondentPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="city">Cidade</Label>
+                <Label htmlFor="region">Região</Label>
                 <Input
-                  id="city"
-                  {...register('city')}
-                  placeholder="São Paulo"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="state">Estado</Label>
-                <Input
-                  id="state"
-                  {...register('state')}
-                  placeholder="SP"
-                  maxLength={2}
+                  id="region"
+                  {...register('region')}
+                  placeholder="Ex: Região Sul, São Paulo, etc."
                 />
               </div>
             </div>

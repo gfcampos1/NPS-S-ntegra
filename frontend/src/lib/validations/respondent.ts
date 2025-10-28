@@ -6,10 +6,9 @@ export const createRespondentSchema = z.object({
   type: z.enum(['MEDICO', 'DISTRIBUIDOR']),
   category: z.string().optional(),
   specialty: z.string().optional(),
-  crm: z.string().optional(),
+  region: z.string().optional(),
+  company: z.string().optional(),
   phone: z.string().optional(),
-  city: z.string().optional(),
-  state: z.string().optional(),
   metadata: z.record(z.any()).optional(),
 })
 

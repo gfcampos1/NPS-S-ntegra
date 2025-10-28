@@ -149,12 +149,10 @@ export default async function RespondentsPage() {
                             <span>{respondent.phone}</span>
                           </div>
                         )}
-                        {(respondent.city || respondent.state) && (
+                        {respondent.region && (
                           <div className="flex items-center gap-2">
                             <MapPin className="h-4 w-4" />
-                            <span>
-                              {[respondent.city, respondent.state].filter(Boolean).join(', ')}
-                            </span>
+                            <span>{respondent.region}</span>
                           </div>
                         )}
                       </div>
@@ -162,7 +160,6 @@ export default async function RespondentsPage() {
                       {respondent.specialty && (
                         <div className="text-sm text-sintegra-gray-medium">
                           Especialidade: {respondent.specialty}
-                          {respondent.crm && ` • CRM: ${respondent.crm}`}
                         </div>
                       )}
 

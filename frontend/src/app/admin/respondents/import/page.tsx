@@ -64,10 +64,9 @@ export default function ImportRespondentsPage() {
         type: item.type || item.tipo || 'MEDICO',
         category: item.category || item.categoria,
         specialty: item.specialty || item.especialidade,
-        crm: item.crm,
+        region: item.region || item.regiao,
+        company: item.company || item.empresa,
         phone: item.phone || item.telefone,
-        city: item.city || item.cidade,
-        state: item.state || item.estado,
       }))
 
       const response = await fetch('/api/respondents/import', {
@@ -92,9 +91,9 @@ export default function ImportRespondentsPage() {
   }
 
   const downloadTemplate = () => {
-    const template = `name,email,type,category,specialty,crm,phone,city,state
-Dr. João Silva,joao@exemplo.com,MEDICO,Clínico Geral,Cardiologia,123456/SP,(11) 98765-4321,São Paulo,SP
-Maria Oliveira,maria@distribuidora.com,DISTRIBUIDOR,Regional,,,(11) 98765-1234,São Paulo,SP`
+    const template = `name,email,type,category,specialty,region,company,phone
+Dr. João Silva,joao@exemplo.com,MEDICO,Clínico Geral,Cardiologia,São Paulo,,(11) 98765-4321
+Maria Oliveira,maria@distribuidora.com,DISTRIBUIDOR,Regional,,Região Sul,Distribuidora ABC,(11) 98765-1234`
     
     const blob = new Blob([template], { type: 'text/csv' })
     const url = URL.createObjectURL(blob)
@@ -141,10 +140,9 @@ Maria Oliveira,maria@distribuidora.com,DISTRIBUIDOR,Regional,,,(11) 98765-1234,S
                 <li>• <strong>type</strong> (MEDICO ou DISTRIBUIDOR)</li>
                 <li>• category (opcional)</li>
                 <li>• specialty (opcional)</li>
-                <li>• crm (opcional)</li>
+                <li>• region (opcional)</li>
+                <li>• company (opcional)</li>
                 <li>• phone (opcional)</li>
-                <li>• city (opcional)</li>
-                <li>• state (opcional)</li>
               </ul>
               <Button onClick={downloadTemplate} variant="outline" className="w-full">
                 <Download className="h-4 w-4 mr-2" />
