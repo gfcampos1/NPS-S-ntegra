@@ -22,6 +22,7 @@ export async function GET(
             email: true,
           },
         },
+        answers: true,
       },
     })
 
@@ -39,10 +40,16 @@ export async function GET(
       )
     }
 
+    // Transformar array de answers em objeto { questionId: value }
+    const progress = response.answers.reduce((acc: any, answer: any) => {
+      acc[answer.questionId] = answer.numericValue ?? answer.textValue ?? answer.selectedOption
+      return acc
+    }, {})
+
     return NextResponse.json({
       form: response.form,
       respondent: response.respondent,
-      progress: response.answers || {},
+      progress,
       responseId: response.id,
     })
   } catch (error) {
