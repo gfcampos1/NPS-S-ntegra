@@ -2,6 +2,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { prisma } from '@/lib/prisma'
 import { calculateNPS, interpretNPS } from '@/lib/nps'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 async function getDashboardData() {
   // Buscar todas as respostas com score NPS
   const responses = await prisma.response.findMany({

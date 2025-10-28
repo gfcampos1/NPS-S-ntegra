@@ -5,6 +5,9 @@ import Link from 'next/link'
 import { formatDistanceToNow } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 async function getForms() {
   const forms = await prisma.form.findMany({
     include: {
