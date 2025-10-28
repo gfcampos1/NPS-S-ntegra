@@ -69,14 +69,19 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const validatedData = createRespondentSchema.parse(body)
 
-    // Check if email already exists
+    // Check if email + type already exists
     const existingRespondent = await prisma.respondent.findUnique({
-      where: { email: validatedData.email },
+      where: { 
+        email_type: {
+          email: validatedData.email,
+          type: validatedData.type,
+        }
+      },
     })
 
     if (existingRespondent) {
       return NextResponse.json(
-        { error: 'Email já cadastrado' },
+        { error: 'Email e tipo já cadastrados' },
         { status: 400 }
       )
     }
