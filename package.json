@@ -1,0 +1,15 @@
+{
+  "name": "nps-sintegra",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "install": "cd frontend && npm install",
+    "build": "cd frontend && npx prisma generate && npm run build",
+    "start": "cd frontend && npm start",
+    "migrate": "cd frontend && npx prisma migrate deploy"
+  },
+  "engines": {
+    "node": ">=18.17.0",
+    "npm": ">=9.0.0"
+  }
+}
