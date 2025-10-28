@@ -10,6 +10,11 @@ frontend/out
 frontend/.env.local
 frontend/*.tsbuildinfo
 
+# Build artifacts and logs
+.next/
+build-log.txt
+build-output.txt
+
 # Editor
 .vscode
 .idea
