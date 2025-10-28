@@ -1,0 +1,18 @@
+{
+  "name": "Sistema NPS - Síntegra",
+  "short_name": "NPS Síntegra",
+  "description": "Sistema de coleta de dados NPS para médicos e distribuidores",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#4169B1",
+  "theme_color": "#4169B1",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/assets/logos/sintegra-logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

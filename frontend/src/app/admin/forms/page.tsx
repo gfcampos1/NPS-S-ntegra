@@ -1,0 +1,143 @@
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { prisma } from '@/lib/prisma'
+import Link from 'next/link'
+import { formatDistanceToNow } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
+
+async function getForms() {
+  const forms = await prisma.form.findMany({
+    include: {
+      creator: {
+        select: {
+          name: true,
+        },
+      },
+      _count: {
+        select: {
+          questions: true,
+          responses: true,
+        },
+      },
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+  })
+
+  return forms
+}
+
+const statusLabels: Record<string, string> = {
+  DRAFT: 'Rascunho',
+  PUBLISHED: 'Publicado',
+  PAUSED: 'Pausado',
+  CLOSED: 'Encerrado',
+  ARCHIVED: 'Arquivado',
+}
+
+const statusColors: Record<string, string> = {
+  DRAFT: 'bg-gray-100 text-gray-800',
+  PUBLISHED: 'bg-green-100 text-green-800',
+  PAUSED: 'bg-yellow-100 text-yellow-800',
+  CLOSED: 'bg-red-100 text-red-800',
+  ARCHIVED: 'bg-gray-100 text-gray-600',
+}
+
+const typeLabels: Record<string, string> = {
+  MEDICOS: 'Médicos',
+  DISTRIBUIDORES: 'Distribuidores',
+  CUSTOM: 'Personalizado',
+}
+
+export default async function FormsPage() {
+  const forms = await getForms()
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-3xl font-bold text-sintegra-gray-dark">Formulários</h2>
+          <p className="text-sintegra-gray-medium">
+            Gerencie os formulários de pesquisa NPS
+          </p>
+        </div>
+        <Link href="/admin/forms/new">
+          <Button>+ Novo Formulário</Button>
+        </Link>
+      </div>
+
+      {forms.length === 0 ? (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <p className="text-lg text-sintegra-gray-medium mb-4">
+              Nenhum formulário criado ainda
+            </p>
+            <Link href="/admin/forms/new">
+              <Button>Criar Primeiro Formulário</Button>
+            </Link>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {forms.map((form) => (
+            <Card key={form.id} className="hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div className="space-y-1 flex-1">
+                    <CardTitle className="text-lg">{form.title}</CardTitle>
+                    <CardDescription className="line-clamp-2">
+                      {form.description || 'Sem descrição'}
+                    </CardDescription>
+                  </div>
+                  <span
+                    className={`text-xs px-2 py-1 rounded-full font-medium ${
+                      statusColors[form.status]
+                    }`}
+                  >
+                    {statusLabels[form.status]}
+                  </span>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-sintegra-gray-medium">Tipo:</span>
+                  <span className="font-medium">{typeLabels[form.type]}</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-sintegra-gray-medium">Perguntas:</span>
+                  <span className="font-medium">{form._count.questions}</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-sintegra-gray-medium">Respostas:</span>
+                  <span className="font-medium">{form._count.responses}</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-sintegra-gray-medium">Criado:</span>
+                  <span className="font-medium">
+                    {formatDistanceToNow(new Date(form.createdAt), {
+                      addSuffix: true,
+                      locale: ptBR,
+                    })}
+                  </span>
+                </div>
+                <div className="pt-4 flex gap-2">
+                  <Link href={`/admin/forms/${form.id}`} className="flex-1">
+                    <Button variant="outline" className="w-full" size="sm">
+                      Ver Detalhes
+                    </Button>
+                  </Link>
+                  <Link href={`/admin/forms/${form.id}/edit`} className="flex-1">
+                    <Button className="w-full" size="sm">
+                      Editar
+                    </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}

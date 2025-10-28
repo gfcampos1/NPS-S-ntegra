@@ -1,0 +1,380 @@
+// Prisma Schema - Sistema NPS Síntegra
+// Database: PostgreSQL (Supabase)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// AUTENTICAÇÃO E USUÁRIOS
+// ==========================================
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String
+  password      String    // Hash bcrypt
+  role          Role      @default(ADMIN)
+  avatar        String?
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  lastLogin     DateTime?
+  
+  // Relações
+  forms         Form[]
+  reports       Report[]
+  auditLogs     AuditLog[]
+  
+  @@index([email])
+  @@map("users")
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  VIEWER
+}
+
+// ==========================================
+// RESPONDENTES (Médicos e Distribuidores)
+// ==========================================
+
+model Respondent {
+  id            String           @id @default(cuid())
+  name          String
+  email         String
+  phone         String?
+  type          RespondentType
+  
+  // Segmentação
+  category      String?          // Ex: "Cardiologia", "Região Sul", etc
+  specialty     String?          // Especialidade médica
+  region        String?          // Região geográfica
+  company       String?          // Empresa do distribuidor
+  
+  // Metadados
+  metadata      Json?            // Dados adicionais flexíveis
+  consent       Boolean          @default(false)  // LGPD
+  consentDate   DateTime?
+  
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  
+  // Relações
+  responses     Response[]
+  
+  @@unique([email, type])
+  @@index([email])
+  @@index([type])
+  @@index([category])
+  @@map("respondents")
+}
+
+enum RespondentType {
+  MEDICO
+  DISTRIBUIDOR
+}
+
+// ==========================================
+// FORMULÁRIOS
+// ==========================================
+
+model Form {
+  id            String      @id @default(cuid())
+  title         String
+  description   String?
+  type          FormType
+  
+  // Configurações
+  status        FormStatus  @default(DRAFT)
+  
+  // Aparência
+  welcomeTitle  String?     // Título da tela de boas-vindas
+  welcomeText   String?     // Texto explicativo inicial
+  thankYouTitle String?     // "Obrigado pela participação!"
+  thankYouText  String?
+  
+  // Distribuição
+  expiresAt     DateTime?   // Data de expiração
+  maxResponses  Int?        // Limite de respostas
+  
+  // Metadados
+  createdBy     String
+  creator       User        @relation(fields: [createdBy], references: [id])
+  
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  publishedAt   DateTime?
+  
+  // Relações
+  questions     Question[]
+  responses     Response[]
+  
+  @@index([type])
+  @@index([status])
+  @@index([createdBy])
+  @@map("forms")
+}
+
+enum FormType {
+  MEDICOS
+  DISTRIBUIDORES
+  CUSTOM
+}
+
+enum FormStatus {
+  DRAFT           // Rascunho
+  PUBLISHED       // Publicado e ativo
+  PAUSED          // Pausado temporariamente
+  CLOSED          // Encerrado
+  ARCHIVED        // Arquivado
+}
+
+// ==========================================
+// PERGUNTAS
+// ==========================================
+
+model Question {
+  id            String       @id @default(cuid())
+  formId        String
+  form          Form         @relation(fields: [formId], references: [id], onDelete: Cascade)
+  
+  // Conteúdo
+  text          String
+  description   String?      // Texto auxiliar
+  type          QuestionType
+  order         Int          // Ordem de exibição
+  
+  // Configurações
+  required      Boolean      @default(true)
+  
+  // Opções para múltipla escolha
+  options       Json?        // ["Melhor", "Igual", "Pior"]
+  
+  // Escala para rating
+  scaleMin      Int?         // 1
+  scaleMax      Int?         // 5
+  scaleLabels   Json?        // { "1": "Péssima", "5": "Excelente" }
+  
+  // Lógica Condicional
+  conditionalLogic Json?     // Regras de quando aparecer/ser obrigatória
+  
+  // Exemplo de conditionalLogic:
+  // {
+  //   "makeRequired": {
+  //     "dependsOn": "question_id_anterior",
+  //     "condition": "<=",
+  //     "value": 3,
+  //     "message": "Campo obrigatório para avaliações ≤ 3"
+  //   },
+  //   "showIf": {
+  //     "dependsOn": "question_id",
+  //     "condition": "==",
+  //     "value": "SIM"
+  //   }
+  // }
+  
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  
+  // Relações
+  answers       Answer[]
+  
+  @@index([formId])
+  @@index([order])
+  @@map("questions")
+}
+
+enum QuestionType {
+  RATING_1_5        // Escala 1-5 (Péssima a Excelente)
+  RATING_0_10       // NPS clássico (0-10)
+  COMPARISON        // Melhor/Igual/Pior
+  TEXT_SHORT        // Texto curto (1 linha)
+  TEXT_LONG         // Texto longo (textarea)
+  MULTIPLE_CHOICE   // Múltipla escolha
+  SINGLE_CHOICE     // Escolha única
+  YES_NO            // Sim/Não
+}
+
+// ==========================================
+// RESPOSTAS
+// ==========================================
+
+model Response {
+  id            String       @id @default(cuid())
+  
+  // Relações
+  formId        String
+  form          Form         @relation(fields: [formId], references: [id])
+  
+  respondentId  String?      // Opcional (pode ser anônimo)
+  respondent    Respondent?  @relation(fields: [respondentId], references: [id])
+  
+  // Link único para resposta
+  uniqueToken   String       @unique @default(cuid())
+  
+  // Status
+  status        ResponseStatus @default(IN_PROGRESS)
+  progress      Int          @default(0) // Percentual 0-100
+  
+  // Timestamps
+  startedAt     DateTime     @default(now())
+  completedAt   DateTime?
+  
+  // Metadados
+  ipAddress     String?
+  userAgent     String?
+  deviceType    String?      // mobile, tablet, desktop
+  
+  // Relações
+  answers       Answer[]
+  
+  @@index([formId])
+  @@index([respondentId])
+  @@index([uniqueToken])
+  @@index([status])
+  @@map("responses")
+}
+
+enum ResponseStatus {
+  IN_PROGRESS
+  COMPLETED
+  ABANDONED
+}
+
+// ==========================================
+// RESPOSTAS INDIVIDUAIS
+// ==========================================
+
+model Answer {
+  id            String    @id @default(cuid())
+  
+  // Relações
+  responseId    String
+  response      Response  @relation(fields: [responseId], references: [id], onDelete: Cascade)
+  
+  questionId    String
+  question      Question  @relation(fields: [questionId], references: [id])
+  
+  // Valores (usar o campo apropriado conforme tipo)
+  numericValue  Int?      // Para ratings e NPS
+  textValue     String?   // Para textos e comentários
+  selectedOption String?  // Para múltipla escolha
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  @@unique([responseId, questionId])
+  @@index([responseId])
+  @@index([questionId])
+  @@map("answers")
+}
+
+// ==========================================
+// RELATÓRIOS
+// ==========================================
+
+model Report {
+  id            String    @id @default(cuid())
+  title         String
+  description   String?
+  
+  // Configuração
+  formId        String?   // Null = todos os formulários
+  filters       Json?     // Filtros aplicados
+  
+  // Exemplo de filters:
+  // {
+  //   "dateRange": { "start": "2024-01-01", "end": "2024-12-31" },
+  //   "respondentType": "MEDICO",
+  //   "category": "Cardiologia",
+  //   "minRating": 3
+  // }
+  
+  // Arquivo gerado
+  pdfUrl        String?
+  csvUrl        String?
+  
+  // Metadados
+  generatedBy   String
+  generator     User      @relation(fields: [generatedBy], references: [id])
+  
+  createdAt     DateTime  @default(now())
+  
+  @@index([formId])
+  @@index([generatedBy])
+  @@map("reports")
+}
+
+// ==========================================
+// AUDIT LOG (Segurança e Compliance)
+// ==========================================
+
+model AuditLog {
+  id            String    @id @default(cuid())
+  
+  userId        String?
+  user          User?     @relation(fields: [userId], references: [id])
+  
+  action        String    // CREATE_FORM, DELETE_RESPONSE, EXPORT_DATA
+  entityType    String    // Form, Response, Respondent
+  entityId      String
+  
+  changes       Json?     // O que foi alterado
+  ipAddress     String?
+  userAgent     String?
+  
+  createdAt     DateTime  @default(now())
+  
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+// ==========================================
+// TEMPLATES DE EMAIL
+// ==========================================
+
+model EmailTemplate {
+  id            String    @id @default(cuid())
+  name          String    @unique
+  subject       String
+  htmlContent   String    // HTML do email
+  textContent   String    // Versão texto
+  
+  // Variáveis disponíveis: {name}, {link}, {formTitle}, etc
+  variables     Json?
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  @@map("email_templates")
+}
+
+// ==========================================
+// CONFIGURAÇÕES DO SISTEMA
+// ==========================================
+
+model Settings {
+  id            String    @id @default(cuid())
+  key           String    @unique
+  value         Json
+  description   String?
+  
+  updatedAt     DateTime  @updatedAt
+  
+  @@map("settings")
+}
+
+// Exemplos de Settings:
+// - nps_target: { "medicos": 50, "distribuidores": 60 }
+// - email_sender: { "name": "Síntegra", "email": "nps@sintegra.com.br" }
+// - response_expiration_days: 30
+// - max_reminders: 3
