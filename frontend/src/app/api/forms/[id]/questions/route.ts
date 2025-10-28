@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth-options'
 import { prisma } from '@/lib/prisma'
 import { createQuestionSchema } from '@/lib/validations/form'
+import { ZodError } from 'zod'
 
 export async function GET(
   request: NextRequest,
@@ -53,9 +54,10 @@ export async function POST(
 
     return NextResponse.json(question, { status: 201 })
   } catch (error) {
-    if (error instanceof Error && error.name === 'ZodError') {
+    if (error instanceof ZodError) {
+      console.error('Validation error:', error.errors)
       return NextResponse.json(
-        { error: 'Validation error', details: error },
+        { error: 'Validation error', details: error.errors },
         { status: 400 }
       )
     }

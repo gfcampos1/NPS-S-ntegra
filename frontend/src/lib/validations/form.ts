@@ -17,15 +17,14 @@ export const updateFormSchema = z.object({
 export const createQuestionSchema = z.object({
   type: z.enum(['NPS', 'RATING_1_5', 'RATING_0_10', 'COMPARISON', 'TEXT_SHORT', 'TEXT_LONG', 'MULTIPLE_CHOICE', 'SINGLE_CHOICE']),
   text: z.string().min(3, 'Pergunta deve ter no mínimo 3 caracteres'),
-  description: z.string().optional(),
+  description: z.string().optional().nullable(),
   required: z.boolean().default(false),
   order: z.number().int().positive(),
-  options: z.array(z.string()).optional(),
-  conditionalLogic: z.object({
-    dependsOn: z.string().optional(),
-    showWhen: z.record(z.any()).optional(),
-    makeRequired: z.record(z.any()).optional(),
-  }).optional(),
+  options: z.array(z.string()).optional().nullable(),
+  scaleMin: z.number().int().optional().nullable(),
+  scaleMax: z.number().int().optional().nullable(),
+  scaleLabels: z.record(z.string()).optional().nullable(),
+  conditionalLogic: z.record(z.any()).optional().nullable(),
 })
 
 export type CreateFormInput = z.infer<typeof createFormSchema>

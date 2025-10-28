@@ -75,9 +75,18 @@ export function QuestionBuilder({ formId, question, onClose, onSave }: QuestionB
     setError('')
 
     try {
-      const payload = {
-        ...data,
-        options: needsOptions ? options : null,
+      // Build payload - only include options if needed
+      const payload: any = {
+        type: data.type,
+        text: data.text,
+        description: data.description,
+        required: data.required,
+        order: data.order,
+      }
+
+      // Only add options if the question type needs them
+      if (needsOptions) {
+        payload.options = options
       }
 
       const url = question
@@ -95,7 +104,9 @@ export function QuestionBuilder({ formId, question, onClose, onSave }: QuestionB
       })
 
       if (!response.ok) {
-        throw new Error('Erro ao salvar pergunta')
+        const errorData = await response.json()
+        console.error('Error response:', errorData)
+        throw new Error(errorData.error || 'Erro ao salvar pergunta')
       }
 
       onSave()
