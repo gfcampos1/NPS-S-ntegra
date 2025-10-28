@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import { authOptions } from '@/lib/auth-options'
 import { prisma } from '@/lib/prisma'
 import { createFormSchema } from '@/lib/validations/form'
 
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
       data: {
         ...validatedData,
         createdBy: session.user.id,
-      },
+      } as any,
       include: {
         _count: {
           select: {

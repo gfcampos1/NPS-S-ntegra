@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import { authOptions } from '@/lib/auth-options'
 import { prisma } from '@/lib/prisma'
 import { updateFormSchema } from '@/lib/validations/form'
 
@@ -59,7 +59,7 @@ export async function PATCH(
 
     const form = await prisma.form.update({
       where: { id: params.id },
-      data: validatedData,
+      data: validatedData as any,
       include: {
         questions: {
           orderBy: { order: 'asc' },
