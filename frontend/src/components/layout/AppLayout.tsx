@@ -4,6 +4,7 @@ import { useSession } from 'next-auth/react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Sidebar } from './Sidebar';
+import { Header } from './Header';
 import { Loading } from '../ui/Loading';
 
 interface AppLayoutProps {
@@ -58,6 +59,7 @@ export function AppLayout({ children }: AppLayoutProps) {
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar />
       <main className="flex-1 overflow-auto">
+        <Header />
         <div className="min-h-screen">
           {children}
         </div>

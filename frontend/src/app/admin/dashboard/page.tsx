@@ -60,14 +60,7 @@ export default async function DashboardPage() {
   const data = await getDashboardData()
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-3xl font-bold text-sintegra-gray-dark">Dashboard</h2>
-        <p className="text-sintegra-gray-medium">
-          Visão geral do sistema de NPS
-        </p>
-      </div>
-
+    <div className="p-6 space-y-6">
       {/* Cards de métricas */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
