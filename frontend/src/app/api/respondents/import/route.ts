@@ -34,9 +34,14 @@ export async function POST(request: NextRequest) {
         // Validate data
         const validatedData = createRespondentSchema.parse(respondentData)
 
-        // Check if already exists
+        // Check if already exists (email + type is unique)
         const existing = await prisma.respondent.findUnique({
-          where: { email: validatedData.email },
+          where: { 
+            email_type: {
+              email: validatedData.email,
+              type: validatedData.type,
+            }
+          },
         })
 
         if (existing) {
@@ -44,7 +49,7 @@ export async function POST(request: NextRequest) {
           results.details.push({
             email: validatedData.email,
             status: 'duplicate',
-            message: 'Email já cadastrado',
+            message: 'Email e tipo já cadastrados',
           })
           continue
         }
