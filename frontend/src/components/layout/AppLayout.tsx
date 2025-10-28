@@ -16,37 +16,11 @@ export function AppLayout({ children }: AppLayoutProps) {
   const { data: session, status } = useSession();
   const pathname = usePathname();
   const router = useRouter();
-  const [isDark, setIsDark] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    // Load theme from localStorage
-    const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const shouldBeDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
-
-    setIsDark(shouldBeDark);
-
-    // Apply theme immediately
-    if (shouldBeDark) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
   }, []);
-
-  const toggleTheme = () => {
-    const newTheme = isDark ? 'light' : 'dark';
-    setIsDark(!isDark);
-    localStorage.setItem('theme', newTheme);
-
-    if (newTheme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  };
 
   useEffect(() => {
     if (status === 'loading' || !mounted) return;
@@ -81,8 +55,8 @@ export function AppLayout({ children }: AppLayoutProps) {
 
   // Protected routes - with sidebar
   return (
-    <div className="flex min-h-screen bg-gray-50 dark:bg-secondary-900">
-      <Sidebar darkMode={isDark} onToggleDarkMode={toggleTheme} />
+    <div className="flex min-h-screen bg-gray-50">
+      <Sidebar />
       <main className="flex-1 overflow-auto">
         <div className="min-h-screen">
           {children}
