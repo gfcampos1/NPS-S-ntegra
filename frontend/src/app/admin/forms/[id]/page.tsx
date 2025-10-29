@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { FileText, Edit, Send, BarChart3 } from 'lucide-react'
+import { FormStatusActions } from '@/components/forms/FormStatusActions'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -89,11 +90,18 @@ export default async function FormDetailPage({ params }: { params: { id: string 
           )}
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap justify-end">
+          <FormStatusActions formId={form.id} currentStatus={form.status as any} />
           <Link href={`/admin/forms/${form.id}/edit`}>
             <Button variant="outline">
               <Edit className="w-4 h-4 mr-2" />
               Editar
+            </Button>
+          </Link>
+          <Link href={`/admin/forms/${form.id}/preview`}>
+            <Button variant="outline">
+              <BarChart3 className="w-4 h-4 mr-2" />
+              Preview
             </Button>
           </Link>
           {form.status === 'PUBLISHED' && (
