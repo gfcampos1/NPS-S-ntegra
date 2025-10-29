@@ -43,7 +43,10 @@ export async function POST(
     }
 
     const body = await request.json()
+    console.log('Received payload:', JSON.stringify(body, null, 2))
+    
     const validatedData = createQuestionSchema.parse(body)
+    console.log('Validated data:', JSON.stringify(validatedData, null, 2))
 
     const question = await prisma.question.create({
       data: {
@@ -55,7 +58,7 @@ export async function POST(
     return NextResponse.json(question, { status: 201 })
   } catch (error) {
     if (error instanceof ZodError) {
-      console.error('Validation error:', error.errors)
+      console.error('Validation error:', JSON.stringify(error.errors, null, 2))
       return NextResponse.json(
         { error: 'Validation error', details: error.errors },
         { status: 400 }
@@ -63,8 +66,9 @@ export async function POST(
     }
     
     console.error('Error creating question:', error)
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack')
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', message: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     )
   }

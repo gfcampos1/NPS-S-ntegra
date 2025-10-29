@@ -28,7 +28,7 @@ type FormPreviewProps = {
 export function FormPreview({ form }: FormPreviewProps) {
   const renderQuestion = (question: Question) => {
     switch (question.type) {
-      case 'RATING_0_10':
+      case 'NPS':
         return (
           <div className="grid grid-cols-11 gap-1">
             {Array.from({ length: 11 }, (_, i) => (

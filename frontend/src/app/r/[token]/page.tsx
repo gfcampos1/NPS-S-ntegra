@@ -141,7 +141,7 @@ export default function SurveyResponsePage({ params }: { params: { token: string
     const value = answers[question.id]
 
     switch (question.type) {
-      case 'RATING_0_10':
+      case 'NPS':
         return (
           <div className="grid grid-cols-6 gap-2">
             {Array.from({ length: 11 }, (_, i) => (

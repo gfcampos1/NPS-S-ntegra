@@ -29,7 +29,7 @@ type QuestionBuilderProps = {
 }
 
 const questionTypes = [
-  { value: 'RATING_0_10', label: 'Rating 0-10 (NPS)' },
+  { value: 'NPS', label: 'NPS (0-10)' },
   { value: 'RATING_1_5', label: 'Rating 1-5' },
   { value: 'COMPARISON', label: 'Comparação (Melhor/Igual/Pior)' },
   { value: 'TEXT_SHORT', label: 'Texto Curto' },

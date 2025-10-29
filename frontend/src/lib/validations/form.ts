@@ -15,7 +15,7 @@ export const updateFormSchema = z.object({
 })
 
 export const createQuestionSchema = z.object({
-  type: z.enum(['NPS', 'RATING_1_5', 'RATING_0_10', 'COMPARISON', 'TEXT_SHORT', 'TEXT_LONG', 'MULTIPLE_CHOICE', 'SINGLE_CHOICE']),
+  type: z.enum(['NPS', 'RATING_1_5', 'COMPARISON', 'TEXT_SHORT', 'TEXT_LONG', 'MULTIPLE_CHOICE', 'SINGLE_CHOICE']),
   text: z.string().min(3, 'Pergunta deve ter no mínimo 3 caracteres'),
   description: z.string().optional().nullable(),
   required: z.boolean().default(false),

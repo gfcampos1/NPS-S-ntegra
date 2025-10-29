@@ -63,7 +63,6 @@ const typeLabels: Record<string, string> = {
 const questionTypeLabels: Record<string, string> = {
   NPS: 'NPS (0-10)',
   RATING_1_5: 'Escala 1-5',
-  RATING_0_10: 'Escala 0-10',
   COMPARISON: 'Comparação',
   TEXT_SHORT: 'Texto Curto',
   TEXT_LONG: 'Texto Longo',
