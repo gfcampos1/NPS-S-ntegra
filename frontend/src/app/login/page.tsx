@@ -47,14 +47,14 @@ export default function LoginPage() {
           <div className="text-center mb-8">
             <Image
               src="/assets/logos/sintegra-logo.png"
-              alt="Sistema NPS"
+              alt="NPS Manager"
               width={80}
               height={80}
               priority
               className="mx-auto mb-4 h-20 w-20 object-contain"
             />
-            <h1 className="text-3xl font-bold text-sintegra-blue mb-2">Sistema NPS</h1>
-            <p className="text-gray-600">Plataforma de feedback Net Promoter Score</p>
+            <h1 className="text-3xl font-bold text-sintegra-blue mb-2">NPS Manager</h1>
+            <p className="text-gray-600">Sistema de gerenciamento de feedbacks e net promoter score</p>
           </div>
 
           <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">Entrar</h2>

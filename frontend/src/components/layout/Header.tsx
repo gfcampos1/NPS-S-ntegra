@@ -38,13 +38,13 @@ export function Header({ title, subtitle }: HeaderProps) {
     if (pathname.includes('/dashboard')) {
       return {
         title: 'Dashboard',
-        subtitle: 'Visão geral do sistema NPS',
+        subtitle: 'Visão geral do NPS Manager',
       };
     }
 
     return {
-      title: 'Sistema NPS',
-      subtitle: 'Síntegra - Net Promoter Score',
+      title: 'NPS Manager',
+      subtitle: 'Sistema de gerenciamento de feedbacks e net promoter score',
     };
   };
 

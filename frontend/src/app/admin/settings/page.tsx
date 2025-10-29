@@ -14,7 +14,7 @@ export default function SettingsPage() {
         <CardHeader>
           <CardTitle>Gestão de usuários</CardTitle>
           <CardDescription>
-            Crie, remova e defina o nível de acesso dos usuários do Sistema NPS.
+            Crie, remova e defina o nível de acesso dos usuários do NPS Manager.
           </CardDescription>
         </CardHeader>
         <CardContent>
