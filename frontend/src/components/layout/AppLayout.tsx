@@ -11,7 +11,7 @@ interface AppLayoutProps {
   children: React.ReactNode;
 }
 
-const publicRoutes = ['/login', '/'];
+const staticPublicRoutes = ['/login', '/'];
 
 export function AppLayout({ children }: AppLayoutProps) {
   const { data: session, status } = useSession();
@@ -26,7 +26,8 @@ export function AppLayout({ children }: AppLayoutProps) {
   useEffect(() => {
     if (status === 'loading' || !mounted) return;
 
-    const isPublicRoute = publicRoutes.includes(pathname);
+    const isRespondentRoute = pathname?.startsWith('/r/') ?? false;
+    const isPublicRoute = staticPublicRoutes.includes(pathname) || isRespondentRoute;
 
     if (!session && !isPublicRoute) {
       router.push('/login');
@@ -48,7 +49,8 @@ export function AppLayout({ children }: AppLayoutProps) {
   }
 
   // Public routes (login, etc) - no sidebar
-  const isPublicRoute = publicRoutes.includes(pathname);
+  const isPublicRoute =
+    staticPublicRoutes.includes(pathname) || (pathname?.startsWith('/r/') ?? false);
 
   if (isPublicRoute) {
     return <>{children}</>;

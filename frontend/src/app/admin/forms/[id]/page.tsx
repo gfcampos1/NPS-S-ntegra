@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { FileText, Edit, Send, BarChart3 } from 'lucide-react'
+import { FileText, Edit, Send, BarChart3, Eye } from 'lucide-react'
 import { FormStatusActions } from '@/components/forms/FormStatusActions'
 
 export const dynamic = 'force-dynamic'
@@ -92,6 +92,12 @@ export default async function FormDetailPage({ params }: { params: { id: string 
 
         <div className="flex gap-2 flex-wrap justify-end">
           <FormStatusActions formId={form.id} currentStatus={form.status as any} />
+          <Link href={`/admin/forms/${form.id}/responses`}>
+            <Button variant="outline">
+              <Eye className="w-4 h-4 mr-2" />
+              Respostas
+            </Button>
+          </Link>
           <Link href={`/admin/forms/${form.id}/edit`}>
             <Button variant="outline">
               <Edit className="w-4 h-4 mr-2" />
