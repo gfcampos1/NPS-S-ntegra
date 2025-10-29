@@ -1,13 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { signIn } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import Image from 'next/image'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { signIn } from 'next-auth/react'
+import { Mail, Lock, LogIn } from 'lucide-react'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -16,8 +14,8 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault()
     setError('')
     setLoading(true)
 
@@ -36,69 +34,102 @@ export default function LoginPage() {
 
       router.push('/admin/dashboard')
       router.refresh()
-    } catch (error) {
+    } catch (err) {
       setError('Ocorreu um erro ao fazer login')
       setLoading(false)
     }
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-sintegra-blue-light to-sintegra-blue p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-4">
-          <div className="flex justify-center">
-            <div className="h-24 w-24 relative">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-sintegra-blue-light to-sintegra-blue p-4">
+      <div className="w-full max-w-lg">
+        <div className="bg-white rounded-2xl shadow-2xl p-10">
+          <div className="text-center mb-8">
+            <div className="mx-auto mb-4 h-20 w-20 relative">
               <Image
                 src="/assets/logos/sintegra-logo.svg"
-                alt="Síntegra Logo"
+                alt="Sistema NPS"
                 fill
-                className="object-contain"
                 priority
+                className="object-contain"
               />
             </div>
+            <h1 className="text-3xl font-bold text-sintegra-blue mb-2">Sistema NPS</h1>
+            <p className="text-gray-600">Plataforma de feedback Net Promoter Score</p>
           </div>
-          <CardTitle className="text-center text-2xl">Sistema NPS</CardTitle>
-          <CardDescription className="text-center">
-            Faça login para acessar o sistema
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+
+          <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">Entrar</h2>
+
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="seu@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                disabled={loading}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Senha</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                disabled={loading}
-              />
-            </div>
             {error && (
-              <div className="rounded-md bg-red-50 p-3 text-sm text-red-600">
+              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
                 {error}
               </div>
             )}
-            <Button type="submit" className="w-full" disabled={loading}>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">Email</label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sintegra-blue focus:border-transparent outline-none transition"
+                  placeholder="seu@email.com"
+                  required
+                  disabled={loading}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">Senha</label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sintegra-blue focus:border-transparent outline-none transition"
+                  placeholder="********"
+                  required
+                  disabled={loading}
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end">
+              <Link
+                href="#"
+                className="text-sm text-sintegra-blue hover:text-sintegra-blue-dark font-medium underline underline-offset-2"
+              >
+                Esqueci minha senha
+              </Link>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-sintegra-blue hover:bg-sintegra-blue-dark text-white font-semibold py-3 rounded-lg transition flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              <LogIn className="w-5 h-5" />
               {loading ? 'Entrando...' : 'Entrar'}
-            </Button>
+            </button>
           </form>
-        </CardContent>
-      </Card>
+
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-600">
+              Precisa de acesso?{' '}
+              <span className="text-sintegra-blue font-semibold">
+                Contate o administrador do sistema
+              </span>
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
