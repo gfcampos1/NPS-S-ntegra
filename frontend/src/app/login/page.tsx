@@ -41,19 +41,18 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-sintegra-blue-light to-sintegra-blue p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-sintegra p-4">
       <div className="w-full max-w-lg">
         <div className="bg-white rounded-2xl shadow-2xl p-10">
           <div className="text-center mb-8">
-            <div className="mx-auto mb-4 h-20 w-20 relative">
-              <Image
-                src="/assets/logos/sintegra-logo.svg"
-                alt="Sistema NPS"
-                fill
-                priority
-                className="object-contain"
-              />
-            </div>
+            <Image
+              src="/assets/logos/sintegra-logo.svg"
+              alt="Sistema NPS"
+              width={80}
+              height={80}
+              priority
+              className="mx-auto mb-4 h-20 w-20 object-contain"
+            />
             <h1 className="text-3xl font-bold text-sintegra-blue mb-2">Sistema NPS</h1>
             <p className="text-gray-600">Plataforma de feedback Net Promoter Score</p>
           </div>
