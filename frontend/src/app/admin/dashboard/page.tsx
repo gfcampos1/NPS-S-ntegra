@@ -1,5 +1,4 @@
 import { prisma } from '@/lib/prisma'
-import { calculateNPS, interpretNPS } from '@/lib/nps'
 import {
   Card,
   CardContent,
@@ -220,35 +219,16 @@ async function getDashboardData(): Promise<DashboardData> {
 export default async function DashboardPage() {
   const data = await getDashboardData()
 
-  const npsData = calculateNPS(data.npsScores)
-  const interpretation = interpretNPS(npsData.nps)
-  const npsSampleSize = data.npsScores.length
-
   return (
     <div className="p-6 space-y-6">
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">NPS Score</CardTitle>
-            <CardDescription>Status atual</CardDescription>
+            <CardTitle className="text-sm font-medium">Pesquisas realizadas</CardTitle>
+            <CardDescription>Total de respostas concluídas</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold" style={{ color: interpretation.color }}>
-              {npsData.nps}
-            </div>
-            <p className="text-xs text-slate-500">
-              {interpretation.label} &mdash; {interpretation.description}
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Respostas concluídas</CardTitle>
-            <CardDescription>Pesquisas finalizadas</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{data.totalResponses}</div>
+            <div className="text-3xl font-bold text-primary-600">{data.totalResponses}</div>
           </CardContent>
         </Card>
 
@@ -272,55 +252,6 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
       </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Como calculamos o NPS</CardTitle>
-          <CardDescription>
-            O Net Promoter Score é calculado subtraindo a porcentagem de detratores da porcentagem de promotores.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="grid gap-6 md:grid-cols-2">
-          <div className="space-y-3">
-            <div className="rounded-lg border border-slate-200 p-4 bg-slate-50">
-              <p className="font-semibold text-slate-700 mb-2">Fórmula</p>
-              <p className="font-mono text-sm text-slate-700">
-                ((Promotores - Detratores) / Total de respostas) × 100
-              </p>
-            </div>
-            <div className="grid grid-cols-3 gap-3 text-sm">
-              <div className="rounded-lg border border-slate-200 p-3">
-                <p className="text-xs uppercase tracking-wide text-slate-500">Promotores</p>
-                <p className="text-lg font-semibold text-slate-800">{npsData.promoters}</p>
-              </div>
-              <div className="rounded-lg border border-slate-200 p-3">
-                <p className="text-xs uppercase tracking-wide text-slate-500">Neutros</p>
-                <p className="text-lg font-semibold text-slate-800">{npsData.neutrals}</p>
-              </div>
-              <div className="rounded-lg border border-slate-200 p-3">
-                <p className="text-xs uppercase tracking-wide text-slate-500">Detratores</p>
-                <p className="text-lg font-semibold text-slate-800">{npsData.detractors}</p>
-              </div>
-            </div>
-          </div>
-          <div className="rounded-lg border border-slate-200 p-4 bg-gradient-to-br from-white to-slate-50">
-            <p className="text-sm text-slate-500 mb-2">Amostra recente</p>
-            <p className="text-3xl font-bold text-slate-800 mb-1">{npsSampleSize}</p>
-            <p className="text-sm text-slate-500">
-              respostas válidas de NPS consideradas neste cálculo.
-            </p>
-            <div className="mt-4 rounded-md bg-slate-900 text-slate-100 p-4 font-mono text-sm leading-relaxed">
-              <span className="text-green-400">{npsData.promoters}</span>
-              <span> - </span>
-              <span className="text-red-400">{npsData.detractors}</span>
-              <span> ÷ </span>
-              <span className="text-blue-300">{npsSampleSize || 1}</span>
-              <span> × 100 = </span>
-              <span className="text-amber-300">{npsData.nps}</span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
 
       <QuestionInsights data={data.formInsights} />
     </div>
