@@ -4,7 +4,20 @@ import { authOptions } from '@/lib/auth-options'
 import { prisma } from '@/lib/prisma'
 import { generateUniqueToken } from '@/lib/token'
 
+function normalizeUrl(url: string) {
+  return url.endsWith('/') ? url.slice(0, -1) : url
+}
+
 function resolveBaseUrl(request: NextRequest) {
+  const envUrl =
+    process.env.NEXT_PUBLIC_APP_URL ||
+    process.env.NEXTAUTH_URL ||
+    process.env.APP_BASE_URL
+
+  if (envUrl) {
+    return normalizeUrl(envUrl)
+  }
+
   const forwardedHost = request.headers.get('x-forwarded-host')
   const forwardedProto = request.headers.get('x-forwarded-proto')
   const forwardedPort = request.headers.get('x-forwarded-port')
@@ -28,7 +41,7 @@ function resolveBaseUrl(request: NextRequest) {
 
   const origin = request.nextUrl?.origin
   if (origin && origin !== 'null') {
-    return origin
+    return normalizeUrl(origin)
   }
 
   return (
