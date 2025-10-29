@@ -179,10 +179,14 @@ export default function SurveyResponsePage({ params }: { params: { token: string
           </div>
         )
 
-      case 'COMPARISON':
+      case 'COMPARISON': {
+        const comparisonOptions =
+          question.options && question.options.length > 0
+            ? question.options
+            : ['Pior', 'Igual', 'Melhor']
         return (
           <div className="grid grid-cols-1 gap-3">
-            {['Pior', 'Igual', 'Melhor'].map((option) => (
+            {comparisonOptions.map((option) => (
               <button
                 key={option}
                 onClick={() => handleAnswer(question.id, option)}
@@ -197,6 +201,7 @@ export default function SurveyResponsePage({ params }: { params: { token: string
             ))}
           </div>
         )
+      }
 
       case 'TEXT_SHORT':
         return (

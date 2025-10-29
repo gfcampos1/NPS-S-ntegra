@@ -58,10 +58,14 @@ export function FormPreview({ form }: FormPreviewProps) {
           </div>
         )
 
-      case 'COMPARISON':
+      case 'COMPARISON': {
+        const comparisonOptions =
+          question.options && question.options.length > 0
+            ? question.options
+            : ['Pior', 'Igual', 'Melhor']
         return (
           <div className="grid grid-cols-3 gap-2">
-            {['Pior', 'Igual', 'Melhor'].map((option) => (
+            {comparisonOptions.map((option) => (
               <button
                 key={option}
                 className="px-4 py-3 rounded-md border-2 border-gray-300 hover:border-sintegra-blue hover:bg-sintegra-blue hover:text-white transition-colors font-medium"
@@ -72,6 +76,7 @@ export function FormPreview({ form }: FormPreviewProps) {
             ))}
           </div>
         )
+      }
 
       case 'TEXT_SHORT':
         return (

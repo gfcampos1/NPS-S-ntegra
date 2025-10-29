@@ -31,13 +31,12 @@ type QuestionBuilderProps = {
 const questionTypes = [
   { value: 'NPS', label: 'NPS (0-10)' },
   { value: 'RATING_1_5', label: 'Rating 1-5' },
-  { value: 'COMPARISON', label: 'Comparação (Melhor/Igual/Pior)' },
+  { value: 'COMPARISON', label: 'Comparacao (Melhor/Igual/Pior)' },
   { value: 'TEXT_SHORT', label: 'Texto Curto' },
   { value: 'TEXT_LONG', label: 'Texto Longo' },
-  { value: 'MULTIPLE_CHOICE', label: 'Múltipla Escolha' },
-  { value: 'SINGLE_CHOICE', label: 'Escolha Única' },
+  { value: 'MULTIPLE_CHOICE', label: 'Multipla Escolha' },
+  { value: 'SINGLE_CHOICE', label: 'Escolha Unica' },
 ]
-
 export function QuestionBuilder({ formId, question, onClose, onSave }: QuestionBuilderProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
@@ -48,7 +47,6 @@ export function QuestionBuilder({ formId, question, onClose, onSave }: QuestionB
     register,
     handleSubmit,
     watch,
-    setValue,
     formState: { errors },
   } = useForm<CreateQuestionInput>({
     resolver: zodResolver(createQuestionSchema),
@@ -69,6 +67,13 @@ export function QuestionBuilder({ formId, question, onClose, onSave }: QuestionB
 
   const selectedType = watch('type')
   const needsOptions = ['MULTIPLE_CHOICE', 'SINGLE_CHOICE'].includes(selectedType)
+  const defaultComparisonOptions = ['Pior', 'Igual', 'Melhor']
+
+  useEffect(() => {
+    if (!needsOptions) {
+      setOptions([])
+    }
+  }, [needsOptions])
 
   const onSubmit = async (data: CreateQuestionInput) => {
     setIsSubmitting(true)
@@ -88,9 +93,40 @@ export function QuestionBuilder({ formId, question, onClose, onSave }: QuestionB
         payload.description = data.description
       }
 
-      // Only add options if the question type needs them
-      if (needsOptions && options.length > 0) {
-        payload.options = options
+      switch (data.type) {
+        case 'NPS': {
+          payload.scaleMin = 0
+          payload.scaleMax = 10
+          payload.scaleLabels = {
+            0: 'Nada provavel',
+            5: 'Neutro',
+            10: 'Extremamente provavel',
+          }
+          break
+        }
+        case 'RATING_1_5': {
+          payload.scaleMin = 1
+          payload.scaleMax = 5
+          payload.scaleLabels = {
+            1: 'Muito ruim',
+            2: 'Ruim',
+            3: 'Regular',
+            4: 'Bom',
+            5: 'Excelente',
+          }
+          break
+        }
+        case 'COMPARISON': {
+          payload.options = defaultComparisonOptions
+          break
+        }
+        case 'MULTIPLE_CHOICE':
+        case 'SINGLE_CHOICE': {
+          if (options.length > 0) {
+            payload.options = options
+          }
+          break
+        }
       }
 
       const url = question
@@ -182,7 +218,7 @@ export function QuestionBuilder({ formId, question, onClose, onSave }: QuestionB
               <Input
                 id="text"
                 {...register('text')}
-                placeholder="Ex: Em uma escala de 0 a 10, qual a probabilidade de você recomendar nosso produto?"
+                placeholder="Ex: Em uma escala de 0 a 10, qual a probabilidade de voce recomendar nosso produto?"
               />
               {errors.text && (
                 <p className="text-sm text-red-500">{errors.text.message}</p>
@@ -190,7 +226,7 @@ export function QuestionBuilder({ formId, question, onClose, onSave }: QuestionB
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">Descrição (opcional)</Label>
+              <Label htmlFor="description">Descricao (opcional)</Label>
               <Input
                 id="description"
                 {...register('description')}
@@ -215,7 +251,7 @@ export function QuestionBuilder({ formId, question, onClose, onSave }: QuestionB
 
             {needsOptions && (
               <div className="space-y-2">
-                <Label>Opções de Resposta</Label>
+                <Label>Opcoes de Resposta</Label>
                 <div className="space-y-2">
                   {options.map((option, index) => (
                     <div key={index} className="flex gap-2">
@@ -234,7 +270,7 @@ export function QuestionBuilder({ formId, question, onClose, onSave }: QuestionB
                     <Input
                       value={newOption}
                       onChange={(e) => setNewOption(e.target.value)}
-                      placeholder="Nova opção..."
+                      placeholder="Nova opcao..."
                       onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addOption())}
                     />
                     <Button type="button" onClick={addOption}>
@@ -253,7 +289,7 @@ export function QuestionBuilder({ formId, question, onClose, onSave }: QuestionB
                 className="rounded border-gray-300 text-sintegra-blue focus:ring-sintegra-blue"
               />
               <Label htmlFor="required" className="cursor-pointer">
-                Pergunta obrigatória
+                Pergunta obrigatoria
               </Label>
             </div>
 
@@ -277,3 +313,4 @@ export function QuestionBuilder({ formId, question, onClose, onSave }: QuestionB
     </div>
   )
 }
+
