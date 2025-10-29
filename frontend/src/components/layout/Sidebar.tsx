@@ -35,7 +35,6 @@ const navItems: NavItem[] = [
 
 export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
-  const [logoError, setLogoError] = useState(false);
   const pathname = usePathname();
   const { data: session } = useSession();
   const isAdmin = (session?.user as any)?.role === "SUPER_ADMIN" || (session?.user as any)?.role === "ADMIN";
@@ -72,9 +71,13 @@ export function Sidebar() {
                 transition={{ duration: 0.2 }}
                 className="flex items-center gap-3"
               >
-                <div className="w-10 h-10 rounded-lg bg-gradient-sintegra flex items-center justify-center">
-                  <span className="text-white font-bold text-xl">S</span>
-                </div>
+                <Image
+                  src="/assets/logos/sintegra-logo.png"
+                  alt="Síntegra Logo"
+                  width={40}
+                  height={40}
+                  className="w-10 h-10 rounded-lg object-contain"
+                />
                 <div>
                   <h1 className="font-bold text-lg text-secondary-900">
                     Síntegra
@@ -88,9 +91,13 @@ export function Sidebar() {
           </AnimatePresence>
 
           {collapsed && (
-            <div className="w-10 h-10 rounded-lg bg-gradient-sintegra flex items-center justify-center mx-auto">
-              <span className="text-white font-bold text-xl">S</span>
-            </div>
+            <Image
+              src="/assets/logos/sintegra-logo.png"
+              alt="Síntegra Logo"
+              width={40}
+              height={40}
+              className="w-10 h-10 rounded-lg object-contain mx-auto"
+            />
           )}
         </div>
 

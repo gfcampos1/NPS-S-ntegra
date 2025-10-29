@@ -46,7 +46,7 @@ export default function LoginPage() {
         <div className="bg-white rounded-2xl shadow-2xl p-10">
           <div className="text-center mb-8">
             <Image
-              src="/assets/logos/sintegra-logo.svg"
+              src="/assets/logos/sintegra-logo.png"
               alt="Sistema NPS"
               width={80}
               height={80}
