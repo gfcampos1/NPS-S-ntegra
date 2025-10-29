@@ -6,8 +6,8 @@ import { Providers } from '@/components/providers'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Sistema NPS - Síntegra',
-  description: 'Sistema de coleta de dados NPS para médicos e distribuidores',
+  title: 'NPS Manager - Síntegra',
+  description: 'Sistema de gerenciamento de feedbacks e net promoter score',
   manifest: '/manifest.json',
   icons: {
     icon: '/favicon.svg',
