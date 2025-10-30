@@ -211,7 +211,7 @@ model Response {
   
   // Relações
   formId        String
-  form          Form         @relation(fields: [formId], references: [id])
+  form          Form         @relation(fields: [formId], references: [id], onDelete: Cascade)
   
   respondentId  String?      // Opcional (pode ser anônimo)
   respondent    Respondent?  @relation(fields: [respondentId], references: [id])
