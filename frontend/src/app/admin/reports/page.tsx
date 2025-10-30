@@ -1,172 +1,174 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { FileText, Download, Calendar, Filter } from 'lucide-react'
+'use client'
+
+import { useEffect, useState } from 'react'
+import { ReportGenerator } from '@/components/reports/ReportGenerator'
+import { ReportsList } from '@/components/reports/ReportsList'
+import { Card, CardContent } from '@/components/ui/card'
+import { Loader2, TrendingUp } from 'lucide-react'
+
+interface Form {
+  id: string
+  title: string
+  type: string
+  status: string
+}
+
+interface Report {
+  id: string
+  title: string
+  description: string | null
+  formId: string | null
+  filters: any
+  csvUrl: string | null
+  pdfUrl: string | null
+  generatedBy: string
+  generator: {
+    name: string
+    email: string
+  }
+  createdAt: string
+}
 
 export default function ReportsPage() {
+  const [forms, setForms] = useState<Form[]>([])
+  const [reports, setReports] = useState<Report[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  // Carrega dados iniciais
+  useEffect(() => {
+    loadData()
+  }, [])
+
+  const loadData = async () => {
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      // Carrega formulários e relatórios em paralelo
+      const [formsRes, reportsRes] = await Promise.all([
+        fetch('/api/forms'),
+        fetch('/api/reports'),
+      ])
+
+      if (!formsRes.ok || !reportsRes.ok) {
+        throw new Error('Erro ao carregar dados')
+      }
+
+      const formsData = await formsRes.json()
+      const reportsData = await reportsRes.json()
+
+      setForms(formsData.filter((f: Form) => f.status === 'PUBLISHED'))
+      setReports(reportsData)
+    } catch (err: any) {
+      setError(err.message || 'Erro ao carregar dados')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleReportGenerated = () => {
+    // Recarrega a lista de relatórios
+    loadData()
+  }
+
+  const handleReportDeleted = (id: string) => {
+    // Remove da lista local
+    setReports(reports.filter((r) => r.id !== id))
+  }
+
+  if (isLoading) {
+    return (
+      <div className="p-6 flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin text-primary-600 mx-auto mb-3" />
+          <p className="text-gray-600">Carregando relatórios...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="p-6">
+        <Card>
+          <CardContent className="pt-6">
+            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg">
+              {error}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
   return (
     <div className="p-6 space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Relatórios</CardTitle>
-          <CardDescription>
-            Gere e visualize relatórios detalhados de NPS
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {/* Relatório Geral */}
-            <div className="rounded-lg border border-gray-200 p-4 hover:border-primary-500 transition-colors cursor-not-allowed opacity-60">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
-                  <FileText className="w-5 h-5 text-primary-600" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-sintegra-gray-dark mb-1">
-                    Relatório Geral de NPS
-                  </h3>
-                  <p className="text-sm text-sintegra-gray-medium mb-3">
-                    Visão completa de todas as métricas
-                  </p>
-                  <div className="flex gap-2">
-                    <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
-                      Em breve
-                    </span>
-                  </div>
-                </div>
+      {/* Estatísticas Resumidas */}
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">
+                  Formulários Publicados
+                </p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {forms.length}
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <TrendingUp className="w-6 h-6 text-blue-600" />
               </div>
             </div>
+          </CardContent>
+        </Card>
 
-            {/* Relatório por Período */}
-            <div className="rounded-lg border border-gray-200 p-4 hover:border-primary-500 transition-colors cursor-not-allowed opacity-60">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
-                  <Calendar className="w-5 h-5 text-primary-600" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-sintegra-gray-dark mb-1">
-                    Análise por Período
-                  </h3>
-                  <p className="text-sm text-sintegra-gray-medium mb-3">
-                    Compare diferentes períodos
-                  </p>
-                  <div className="flex gap-2">
-                    <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
-                      Em breve
-                    </span>
-                  </div>
-                </div>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">
+                  Relatórios Gerados
+                </p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {reports.length}
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                <TrendingUp className="w-6 h-6 text-green-600" />
               </div>
             </div>
+          </CardContent>
+        </Card>
 
-            {/* Relatório por Segmento */}
-            <div className="rounded-lg border border-gray-200 p-4 hover:border-primary-500 transition-colors cursor-not-allowed opacity-60">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
-                  <Filter className="w-5 h-5 text-primary-600" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-sintegra-gray-dark mb-1">
-                    Análise por Segmento
-                  </h3>
-                  <p className="text-sm text-sintegra-gray-medium mb-3">
-                    Filtre por categoria ou região
-                  </p>
-                  <div className="flex gap-2">
-                    <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
-                      Em breve
-                    </span>
-                  </div>
-                </div>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">
+                  Exports Disponíveis
+                </p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {reports.filter(r => r.csvUrl).length}
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  Arquivos CSV
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                <TrendingUp className="w-6 h-6 text-purple-600" />
               </div>
             </div>
+          </CardContent>
+        </Card>
+      </div>
 
-            {/* Export Excel */}
-            <div className="rounded-lg border border-gray-200 p-4 hover:border-primary-500 transition-colors cursor-not-allowed opacity-60">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                  <Download className="w-5 h-5 text-green-600" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-sintegra-gray-dark mb-1">
-                    Export Excel
-                  </h3>
-                  <p className="text-sm text-sintegra-gray-medium mb-3">
-                    Baixe dados em planilha
-                  </p>
-                  <div className="flex gap-2">
-                    <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
-                      Em breve
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
+      {/* Gerador de Relatórios */}
+      <ReportGenerator forms={forms} onReportGenerated={handleReportGenerated} />
 
-            {/* Export PDF */}
-            <div className="rounded-lg border border-gray-200 p-4 hover:border-primary-500 transition-colors cursor-not-allowed opacity-60">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
-                  <Download className="w-5 h-5 text-red-600" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-sintegra-gray-dark mb-1">
-                    Export PDF
-                  </h3>
-                  <p className="text-sm text-sintegra-gray-medium mb-3">
-                    Relatório em PDF profissional
-                  </p>
-                  <div className="flex gap-2">
-                    <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
-                      Em breve
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Agendamento */}
-            <div className="rounded-lg border border-gray-200 p-4 hover:border-primary-500 transition-colors cursor-not-allowed opacity-60">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <Calendar className="w-5 h-5 text-purple-600" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-sintegra-gray-dark mb-1">
-                    Relatórios Agendados
-                  </h3>
-                  <p className="text-sm text-sintegra-gray-medium mb-3">
-                    Configure envio automático
-                  </p>
-                  <div className="flex gap-2">
-                    <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
-                      Em breve
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Info Card */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex items-start gap-3">
-            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-              <FileText className="w-5 h-5 text-blue-600" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-sintegra-gray-dark mb-2">
-                Sistema de Relatórios em Desenvolvimento
-              </h3>
-              <p className="text-sm text-sintegra-gray-medium">
-                As funcionalidades de relatórios estão sendo desenvolvidas e estarão disponíveis em breve. 
-                Você poderá gerar relatórios detalhados, exportar dados e agendar envios automáticos.
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Lista de Relatórios */}
+      <ReportsList reports={reports} onDelete={handleReportDeleted} />
     </div>
   )
 }
