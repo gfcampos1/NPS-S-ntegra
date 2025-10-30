@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { FileText, Users, BarChart3, LayoutDashboard } from "lucide-react";
+import { FileText, Users, BarChart3, LayoutDashboard, MessageSquare } from "lucide-react";
 
 interface HeaderProps {
   title?: string;
@@ -27,6 +27,12 @@ export function Header({ title, subtitle }: HeaderProps) {
       return {
         title: 'Respondentes',
         subtitle: 'Gerencie sua base de contatos',
+      };
+    }
+    if (pathname.includes('/feedbacks')) {
+      return {
+        title: 'Feedbacks',
+        subtitle: 'Comentários e respostas de texto',
       };
     }
     if (pathname.includes('/reports')) {
@@ -57,11 +63,13 @@ export function Header({ title, subtitle }: HeaderProps) {
           <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center">
             {pathname.includes('/forms') && <FileText className="w-5 h-5 text-white" />}
             {pathname.includes('/respondents') && <Users className="w-5 h-5 text-white" />}
+            {pathname.includes('/feedbacks') && <MessageSquare className="w-5 h-5 text-white" />}
             {pathname.includes('/reports') && <BarChart3 className="w-5 h-5 text-white" />}
             {pathname.includes('/dashboard') && <LayoutDashboard className="w-5 h-5 text-white" />}
-            {!pathname.includes('/forms') && 
-             !pathname.includes('/respondents') && 
-             !pathname.includes('/reports') && 
+            {!pathname.includes('/forms') &&
+             !pathname.includes('/respondents') &&
+             !pathname.includes('/feedbacks') &&
+             !pathname.includes('/reports') &&
              !pathname.includes('/dashboard') && (
               <span className="text-white font-bold text-lg">S</span>
             )}
