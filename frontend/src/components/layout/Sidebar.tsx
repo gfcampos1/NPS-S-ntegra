@@ -11,6 +11,7 @@ import {
   FileText,
   Users,
   BarChart3,
+  MessageSquare,
   Settings,
   ChevronLeft,
   ChevronRight,
@@ -30,6 +31,7 @@ const navItems: NavItem[] = [
   { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
   { name: "Formulários", href: "/admin/forms", icon: FileText },
   { name: "Respondentes", href: "/admin/respondents", icon: Users },
+  { name: "Feedbacks", href: "/admin/feedbacks", icon: MessageSquare },
   { name: "Relatórios", href: "/admin/reports", icon: BarChart3, adminOnly: true },
 ];
 
