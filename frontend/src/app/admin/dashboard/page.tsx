@@ -1,12 +1,5 @@
 import { prisma } from '@/lib/prisma'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import { QuestionInsights } from '@/components/dashboard/QuestionInsights'
+import { DashboardClient } from '@/components/dashboard/DashboardClient'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -22,16 +15,19 @@ type QuestionInsight = {
 type FormInsight = {
   id: string
   title: string
+  type: string
   totalResponses: number
   questions: QuestionInsight[]
+  responsesByDate: Record<string, number>
 }
 
 type DashboardData = {
-  npsScores: number[]
   totalForms: number
   totalRespondents: number
   totalResponses: number
   formInsights: FormInsight[]
+  responsesByType: Record<string, number>
+  responsesByMonth: Record<string, number>
 }
 
 const SUPPORTED_CHART_TYPES = new Set([
@@ -47,7 +43,7 @@ async function getDashboardData(): Promise<DashboardData> {
     where: { status: 'COMPLETED' },
     include: {
       form: {
-        select: { id: true, title: true },
+        select: { id: true, title: true, type: true },
       },
       answers: {
         include: {
@@ -67,12 +63,24 @@ async function getDashboardData(): Promise<DashboardData> {
   const totalForms = await prisma.form.count()
   const totalRespondents = await prisma.respondent.count()
 
+  // Contadores por tipo
+  const responsesByType: Record<string, number> = {
+    MEDICOS: 0,
+    DISTRIBUIDORES: 0,
+    CUSTOM: 0,
+  }
+
+  // Contadores por mês
+  const responsesByMonth: Record<string, number> = {}
+
   const formAccumulator = new Map<
     string,
     {
       id: string
       title: string
+      type: string
       totalResponses: number
+      responsesByDate: Record<string, number>
       questions: Map<
         string,
         {
@@ -86,18 +94,28 @@ async function getDashboardData(): Promise<DashboardData> {
     }
   >()
 
-  const npsScores: number[] = []
-
   for (const response of responses) {
     const formId = response.form.id
     const formTitle = response.form.title
+    const formType = response.form.type
+
+    // Contar por tipo
+    responsesByType[formType] = (responsesByType[formType] || 0) + 1
+
+    // Contar por mês (formato: YYYY-MM)
+    if (response.completedAt) {
+      const monthKey = response.completedAt.toISOString().substring(0, 7)
+      responsesByMonth[monthKey] = (responsesByMonth[monthKey] || 0) + 1
+    }
 
     let formEntry = formAccumulator.get(formId)
     if (!formEntry) {
       formEntry = {
         id: formId,
         title: formTitle,
+        type: formType,
         totalResponses: 0,
+        responsesByDate: {},
         questions: new Map(),
       }
       formAccumulator.set(formId, formEntry)
@@ -105,13 +123,15 @@ async function getDashboardData(): Promise<DashboardData> {
 
     formEntry.totalResponses += 1
 
+    // Contar respostas por data neste formulário
+    if (response.completedAt) {
+      const monthKey = response.completedAt.toISOString().substring(0, 7)
+      formEntry.responsesByDate[monthKey] = (formEntry.responsesByDate[monthKey] || 0) + 1
+    }
+
     for (const answer of response.answers) {
       const question = answer.question
       if (!question) continue
-
-      if (question.type === 'NPS' && answer.numericValue !== null && answer.numericValue !== undefined) {
-        npsScores.push(answer.numericValue)
-      }
 
       if (!SUPPORTED_CHART_TYPES.has(question.type)) {
         continue
@@ -200,7 +220,9 @@ async function getDashboardData(): Promise<DashboardData> {
       return {
         id: form.id,
         title: form.title,
+        type: form.type,
         totalResponses: form.totalResponses,
+        responsesByDate: form.responsesByDate,
         questions,
       }
     })
@@ -208,52 +230,17 @@ async function getDashboardData(): Promise<DashboardData> {
     .sort((a, b) => a.title.localeCompare(b.title))
 
   return {
-    npsScores,
     totalForms,
     totalRespondents,
     totalResponses: responses.length,
     formInsights,
+    responsesByType,
+    responsesByMonth,
   }
 }
 
 export default async function DashboardPage() {
   const data = await getDashboardData()
 
-  return (
-    <div className="p-6 space-y-6">
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Pesquisas realizadas</CardTitle>
-            <CardDescription>Total de respostas concluídas</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-primary-600">{data.totalResponses}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Formulários ativos</CardTitle>
-            <CardDescription>Total cadastrados</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{data.totalForms}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Respondentes cadastrados</CardTitle>
-            <CardDescription>Total de contatos</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{data.totalRespondents}</div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <QuestionInsights data={data.formInsights} />
-    </div>
-  )
+  return <DashboardClient data={data} />
 }
