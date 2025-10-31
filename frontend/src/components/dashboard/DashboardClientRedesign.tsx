@@ -132,7 +132,7 @@ export function DashboardClientRedesign({ data }: { data: DashboardData }) {
                     variant={selectedType === 'ALL' ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => setSelectedType('ALL')}
-                    className={selectedType === 'ALL' ? 'bg-sintegra-blue-primary hover:bg-sintegra-blue-dark' : ''}
+                    className={selectedType === 'ALL' ? 'bg-sintegra-blue hover:bg-sintegra-blue-medium' : ''}
                   >
                     <Activity className="h-4 w-4 mr-1" />
                     Todos
@@ -150,7 +150,7 @@ export function DashboardClientRedesign({ data }: { data: DashboardData }) {
                         variant={selectedType === type ? 'default' : 'outline'}
                         size="sm"
                         onClick={() => setSelectedType(type)}
-                        className={selectedType === type ? 'bg-sintegra-blue-primary hover:bg-sintegra-blue-dark' : ''}
+                        className={selectedType === type ? 'bg-sintegra-blue hover:bg-sintegra-blue-medium' : ''}
                       >
                         <Icon className="h-4 w-4 mr-1" />
                         {label}
@@ -189,7 +189,7 @@ export function DashboardClientRedesign({ data }: { data: DashboardData }) {
                   variant="outline"
                   size="sm"
                   onClick={() => window.location.reload()}
-                  className="w-full hover:bg-sintegra-blue-light/20"
+                  className="w-full hover:bg-primary-50"
                 >
                   <RefreshCw className="h-4 w-4 mr-1" />
                   Atualizar
@@ -208,7 +208,7 @@ export function DashboardClientRedesign({ data }: { data: DashboardData }) {
             animate="visible"
             variants={cardVariants}
           >
-            <Card className="border-none shadow-lg bg-sintegra-blue-primary text-white hover:shadow-xl transition-shadow duration-300">
+            <Card className="border-none shadow-lg bg-sintegra-blue text-white hover:shadow-xl transition-shadow duration-300">
               <CardContent className="p-8">
                 <div className="flex items-start justify-between">
                   <div className="space-y-3 flex-1">
@@ -242,7 +242,7 @@ export function DashboardClientRedesign({ data }: { data: DashboardData }) {
             animate="visible"
             variants={cardVariants}
           >
-            <Card className="border-none shadow-lg bg-green-600 text-white hover:shadow-xl transition-shadow duration-300">
+            <Card className="border-none shadow-lg bg-primary-700 text-white hover:shadow-xl transition-shadow duration-300">
               <CardContent className="p-8">
                 <div className="flex items-start justify-between">
                   <div className="space-y-3 flex-1">
@@ -276,7 +276,7 @@ export function DashboardClientRedesign({ data }: { data: DashboardData }) {
             animate="visible"
             variants={cardVariants}
           >
-            <Card className="border-none shadow-lg bg-purple-600 text-white hover:shadow-xl transition-shadow duration-300">
+            <Card className="border-none shadow-lg bg-primary-800 text-white hover:shadow-xl transition-shadow duration-300">
               <CardContent className="p-8">
                 <div className="flex items-start justify-between">
                   <div className="space-y-3 flex-1">
@@ -325,25 +325,25 @@ export function DashboardClientRedesign({ data }: { data: DashboardData }) {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {/* Médicos */}
-                  <div className="bg-sintegra-blue-light rounded-xl p-6 border-2 border-sintegra-blue-primary/30">
+                  <div className="bg-primary-50 rounded-xl p-6 border-2 border-primary-200">
                     <div className="flex items-center gap-3 mb-4">
-                      <div className="p-3 bg-sintegra-blue-primary rounded-lg">
+                      <div className="p-3 bg-sintegra-blue rounded-lg">
                         <Stethoscope className="h-6 w-6 text-white" />
                       </div>
-                      <h4 className="text-lg font-bold text-sintegra-blue-dark">
+                      <h4 className="text-lg font-bold text-primary-800">
                         Médicos
                       </h4>
                     </div>
                     <div className="space-y-2">
-                      <p className="text-4xl font-bold text-sintegra-blue-primary">
+                      <p className="text-4xl font-bold text-sintegra-blue">
                         {distributionByType.MEDICOS.count}
                       </p>
                       <p className="text-sm text-gray-600">
                         {distributionByType.MEDICOS.percentage}% do total
                       </p>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="w-full bg-primary-100 rounded-full h-2">
                         <div
-                          className="bg-sintegra-blue-primary h-2 rounded-full transition-all duration-500"
+                          className="bg-sintegra-blue h-2 rounded-full transition-all duration-500"
                           style={{ width: `${distributionByType.MEDICOS.percentage}%` }}
                         />
                       </div>
@@ -351,25 +351,25 @@ export function DashboardClientRedesign({ data }: { data: DashboardData }) {
                   </div>
 
                   {/* Distribuidores */}
-                  <div className="bg-green-50 rounded-xl p-6 border-2 border-green-200">
+                  <div className="bg-primary-100 rounded-xl p-6 border-2 border-primary-300">
                     <div className="flex items-center gap-3 mb-4">
-                      <div className="p-3 bg-green-600 rounded-lg">
+                      <div className="p-3 bg-primary-700 rounded-lg">
                         <Building2 className="h-6 w-6 text-white" />
                       </div>
-                      <h4 className="text-lg font-bold text-green-900">
+                      <h4 className="text-lg font-bold text-primary-900">
                         Distribuidores
                       </h4>
                     </div>
                     <div className="space-y-2">
-                      <p className="text-4xl font-bold text-green-600">
+                      <p className="text-4xl font-bold text-primary-700">
                         {distributionByType.DISTRIBUIDORES.count}
                       </p>
                       <p className="text-sm text-gray-600">
                         {distributionByType.DISTRIBUIDORES.percentage}% do total
                       </p>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="w-full bg-primary-200 rounded-full h-2">
                         <div
-                          className="bg-green-600 h-2 rounded-full transition-all duration-500"
+                          className="bg-primary-700 h-2 rounded-full transition-all duration-500"
                           style={{ width: `${distributionByType.DISTRIBUIDORES.percentage}%` }}
                         />
                       </div>
@@ -377,25 +377,25 @@ export function DashboardClientRedesign({ data }: { data: DashboardData }) {
                   </div>
 
                   {/* Customizado */}
-                  <div className="bg-purple-50 rounded-xl p-6 border-2 border-purple-200">
+                  <div className="bg-secondary-100 rounded-xl p-6 border-2 border-secondary-300">
                     <div className="flex items-center gap-3 mb-4">
-                      <div className="p-3 bg-purple-600 rounded-lg">
+                      <div className="p-3 bg-primary-800 rounded-lg">
                         <Settings2 className="h-6 w-6 text-white" />
                       </div>
-                      <h4 className="text-lg font-bold text-purple-900">
+                      <h4 className="text-lg font-bold text-secondary-700">
                         Customizado
                       </h4>
                     </div>
                     <div className="space-y-2">
-                      <p className="text-4xl font-bold text-purple-600">
+                      <p className="text-4xl font-bold text-primary-800">
                         {distributionByType.CUSTOM.count}
                       </p>
                       <p className="text-sm text-gray-600">
                         {distributionByType.CUSTOM.percentage}% do total
                       </p>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="w-full bg-secondary-200 rounded-full h-2">
                         <div
-                          className="bg-purple-600 h-2 rounded-full transition-all duration-500"
+                          className="bg-primary-800 h-2 rounded-full transition-all duration-500"
                           style={{ width: `${distributionByType.CUSTOM.percentage}%` }}
                         />
                       </div>
