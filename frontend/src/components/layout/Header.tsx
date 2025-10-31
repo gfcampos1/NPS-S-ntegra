@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { FileText, Users, BarChart3, LayoutDashboard, MessageSquare } from "lucide-react";
+import { FileText, Users, BarChart3, LayoutDashboard, MessageSquare, Wrench } from "lucide-react";
 
 interface HeaderProps {
   title?: string;
@@ -47,6 +47,12 @@ export function Header({ title, subtitle }: HeaderProps) {
         subtitle: 'Visão geral do NPS Manager',
       };
     }
+    if (pathname.includes('/admin-setup')) {
+      return {
+        title: 'Configuração de Administrador',
+        subtitle: 'Gerenciamento avançado do sistema',
+      };
+    }
 
     return {
       title: 'NPS Manager',
@@ -66,10 +72,12 @@ export function Header({ title, subtitle }: HeaderProps) {
             {pathname.includes('/feedbacks') && <MessageSquare className="w-5 h-5 text-white" />}
             {pathname.includes('/reports') && <BarChart3 className="w-5 h-5 text-white" />}
             {pathname.includes('/dashboard') && <LayoutDashboard className="w-5 h-5 text-white" />}
+            {pathname.includes('/admin-setup') && <Wrench className="w-5 h-5 text-white" />}
             {!pathname.includes('/forms') &&
              !pathname.includes('/respondents') &&
              !pathname.includes('/feedbacks') &&
              !pathname.includes('/reports') &&
+             !pathname.includes('/admin-setup') &&
              !pathname.includes('/dashboard') && (
               <span className="text-white font-bold text-lg">S</span>
             )}

@@ -13,6 +13,7 @@ import {
   BarChart3,
   MessageSquare,
   Settings,
+  Wrench,
   ChevronLeft,
   ChevronRight,
   LogOut,
@@ -40,6 +41,7 @@ export function Sidebar() {
   const pathname = usePathname();
   const { data: session } = useSession();
   const isAdmin = (session?.user as any)?.role === "SUPER_ADMIN" || (session?.user as any)?.role === "ADMIN";
+  const isSuperAdmin = (session?.user as any)?.role === "SUPER_ADMIN";
 
   const filteredNavItems = navItems.filter(
     (item) => !item.adminOnly || isAdmin
@@ -161,6 +163,25 @@ export function Sidebar() {
               )}
             </button>
           </Link>
+
+          {/* Admin Setup Link - Super Admin Only */}
+          {isSuperAdmin && (
+            <Link href="/admin/admin-setup">
+              <button
+                className={cn(
+                  "w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all",
+                  "hover:bg-amber-50",
+                  "text-amber-700",
+                  pathname === "/admin/admin-setup" && "bg-amber-100"
+                )}
+              >
+                <Wrench className="w-5 h-5 flex-shrink-0" />
+                {!collapsed && (
+                  <span className="text-sm font-medium">Admin Setup</span>
+                )}
+              </button>
+            </Link>
+          )}
 
           {/* User Info */}
           {session?.user && (
