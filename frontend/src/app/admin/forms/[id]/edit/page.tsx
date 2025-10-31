@@ -122,30 +122,32 @@ export default function EditFormPage({ params }: { params: { id: string } }) {
   const handleMoveQuestion = async (questionId: string, direction: 'up' | 'down') => {
     if (!form) return
 
-    const questionIndex = form.questions.findIndex(q => q.id === questionId)
+    // Ordena as perguntas pela ordem atual
+    const sortedQuestions = [...form.questions].sort((a, b) => a.order - b.order)
+
+    const questionIndex = sortedQuestions.findIndex(q => q.id === questionId)
     if (questionIndex === -1) return
 
     const targetIndex = direction === 'up' ? questionIndex - 1 : questionIndex + 1
-    if (targetIndex < 0 || targetIndex >= form.questions.length) return
+    if (targetIndex < 0 || targetIndex >= sortedQuestions.length) return
 
-    const currentQuestion = form.questions[questionIndex]
-    const targetQuestion = form.questions[targetIndex]
+    // Troca as posições no array
+    const reorderedQuestions = [...sortedQuestions]
+    const temp = reorderedQuestions[questionIndex]
+    reorderedQuestions[questionIndex] = reorderedQuestions[targetIndex]
+    reorderedQuestions[targetIndex] = temp
 
     try {
-      // Atualiza a ordem das duas perguntas
-      await Promise.all([
-        fetch(`/api/questions/${currentQuestion.id}`, {
+      // Atualiza a ordem de todas as perguntas com valores sequenciais (1, 2, 3, ...)
+      const updates = reorderedQuestions.map((question, index) =>
+        fetch(`/api/questions/${question.id}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ order: targetQuestion.order }),
-        }),
-        fetch(`/api/questions/${targetQuestion.id}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ order: currentQuestion.order }),
-        }),
-      ])
+          body: JSON.stringify({ order: index + 1 }),
+        })
+      )
 
+      await Promise.all(updates)
       await fetchForm()
     } catch (err) {
       setError('Erro ao reordenar perguntas')
@@ -300,41 +302,43 @@ export default function EditFormPage({ params }: { params: { id: string } }) {
                 </div>
               ) : (
                 <div className="space-y-2">
-                  {form.questions.map((question, index) => (
-                    <div
-                      key={question.id}
-                      className="flex items-center gap-3 p-3 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors"
-                    >
-                      <GripVertical className="h-4 w-4 text-gray-400 cursor-move" />
-                      <div className="flex-1">
-                        <p className="font-medium text-sm">
-                          {index + 1}. {question.text}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {question.type.replace('_', ' ')}
-                          {question.required && ' • Obrigatória'}
-                        </p>
-                      </div>
-                      <div className="flex gap-1">
-                        {/* Botões de reordenação */}
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => handleMoveQuestion(question.id, 'up')}
-                          disabled={index === 0}
-                          title="Mover para cima"
-                        >
-                          <ChevronUp className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => handleMoveQuestion(question.id, 'down')}
-                          disabled={index === form.questions.length - 1}
-                          title="Mover para baixo"
-                        >
-                          <ChevronDown className="h-4 w-4" />
-                        </Button>
+                  {(() => {
+                    const sortedQuestions = [...form.questions].sort((a, b) => a.order - b.order)
+                    return sortedQuestions.map((question, index) => (
+                      <div
+                        key={question.id}
+                        className="flex items-center gap-3 p-3 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors"
+                      >
+                        <GripVertical className="h-4 w-4 text-gray-400 cursor-move" />
+                        <div className="flex-1">
+                          <p className="font-medium text-sm">
+                            {index + 1}. {question.text}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {question.type.replace('_', ' ')}
+                            {question.required && ' • Obrigatória'}
+                          </p>
+                        </div>
+                        <div className="flex gap-1">
+                          {/* Botões de reordenação */}
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => handleMoveQuestion(question.id, 'up')}
+                            disabled={index === 0}
+                            title="Mover para cima"
+                          >
+                            <ChevronUp className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => handleMoveQuestion(question.id, 'down')}
+                            disabled={index === sortedQuestions.length - 1}
+                            title="Mover para baixo"
+                          >
+                            <ChevronDown className="h-4 w-4" />
+                          </Button>
 
                         {/* Botão de editar */}
                         <Button
@@ -358,9 +362,10 @@ export default function EditFormPage({ params }: { params: { id: string } }) {
                         >
                           <Trash2 className="h-4 w-4 text-red-500" />
                         </Button>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))
+                  })()}
                 </div>
               )}
             </CardContent>
