@@ -13,6 +13,7 @@ import {
   BarChart3,
   MessageSquare,
   Settings,
+  UserCog,
   Wrench,
   ChevronLeft,
   ChevronRight,
@@ -163,6 +164,25 @@ export function Sidebar() {
               )}
             </button>
           </Link>
+
+          {/* Users Management Link - Super Admin Only */}
+          {isSuperAdmin && (
+            <Link href="/admin/users">
+              <button
+                className={cn(
+                  "w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all",
+                  "hover:bg-blue-50",
+                  "text-blue-700",
+                  pathname === "/admin/users" && "bg-blue-100"
+                )}
+              >
+                <UserCog className="w-5 h-5 flex-shrink-0" />
+                {!collapsed && (
+                  <span className="text-sm font-medium">Usuários</span>
+                )}
+              </button>
+            </Link>
+          )}
 
           {/* Admin Setup Link - Super Admin Only */}
           {isSuperAdmin && (
