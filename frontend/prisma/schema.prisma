@@ -214,7 +214,7 @@ model Response {
   form          Form         @relation(fields: [formId], references: [id], onDelete: Cascade)
   
   respondentId  String?      // Opcional (pode ser anônimo)
-  respondent    Respondent?  @relation(fields: [respondentId], references: [id])
+  respondent    Respondent?  @relation(fields: [respondentId], references: [id], onDelete: SetNull)
   
   // Link único para resposta
   uniqueToken   String       @unique @default(cuid())
