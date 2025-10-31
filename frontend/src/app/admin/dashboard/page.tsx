@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma'
-import { DashboardClient } from '@/components/dashboard/DashboardClient'
+import { DashboardClientRedesign } from '@/components/dashboard/DashboardClientRedesign'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -242,5 +242,5 @@ async function getDashboardData(): Promise<DashboardData> {
 export default async function DashboardPage() {
   const data = await getDashboardData()
 
-  return <DashboardClient data={data} />
+  return <DashboardClientRedesign data={data} />
 }

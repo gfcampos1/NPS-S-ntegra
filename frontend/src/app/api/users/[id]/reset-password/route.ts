@@ -47,11 +47,12 @@ export async function POST(
     const hashedPassword = await hashPassword(tempPassword)
 
     // Atualizar usuário
+    // CWE-257: NÃO armazenar tempPassword em texto claro
     const updatedUser = await prisma.user.update({
       where: { id: userId },
       data: {
         password: hashedPassword,
-        tempPassword: tempPassword, // Armazenar para exibir ao admin
+        tempPassword: null, // Não armazenar em texto claro
         requirePasswordChange: true, // Forçar troca no próximo login
         updatedAt: new Date(),
       },
