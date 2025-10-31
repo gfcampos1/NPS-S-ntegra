@@ -150,10 +150,10 @@ export default function ReportsPage() {
                   Exports Disponíveis
                 </p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {reports.filter(r => r.csvUrl).length}
+                  {reports.length}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
-                  Arquivos CSV
+                  CSV e Excel
                 </p>
               </div>
               <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">

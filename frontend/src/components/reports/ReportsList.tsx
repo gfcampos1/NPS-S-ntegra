@@ -162,29 +162,25 @@ export function ReportsList({ reports, onDelete }: ReportsListProps) {
 
                 {/* Actions */}
                 <div className="flex flex-col gap-2 flex-shrink-0">
-                  {report.csvUrl && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => window.open(report.csvUrl!, '_blank')}
-                      className="w-full"
-                    >
-                      <Download className="w-3 h-3 mr-1" />
-                      CSV
-                    </Button>
-                  )}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => window.open(`/api/reports/${report.id}/export?format=csv`, '_blank')}
+                    className="w-full"
+                  >
+                    <Download className="w-3 h-3 mr-1" />
+                    CSV
+                  </Button>
 
-                  {report.pdfUrl && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => window.open(report.pdfUrl!, '_blank')}
-                      className="w-full"
-                    >
-                      <Download className="w-3 h-3 mr-1" />
-                      PDF
-                    </Button>
-                  )}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => window.open(`/api/reports/${report.id}/export?format=xlsx`, '_blank')}
+                    className="w-full"
+                  >
+                    <Download className="w-3 h-3 mr-1" />
+                    Excel
+                  </Button>
 
                   <Button
                     size="sm"

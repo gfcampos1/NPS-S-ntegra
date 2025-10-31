@@ -1,10 +1,15 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth-options'
 import { prisma } from '@/lib/prisma'
+import { generateReportCSV } from '@/lib/reports/csv-generator'
+import { generateReportXLSX } from '@/lib/reports/xlsx-generator'
 
-// GET /api/reports - Listar relatórios
-export async function GET() {
+// GET /api/reports/[id]/export?format=csv|xlsx
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
     const session = await getServerSession(authOptions)
 
@@ -12,54 +17,23 @@ export async function GET() {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
 
-    const reports = await prisma.report.findMany({
-      include: {
-        generator: {
-          select: {
-            name: true,
-            email: true,
-          },
-        },
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
+    const { searchParams } = new URL(request.url)
+    const format = searchParams.get('format') || 'csv'
+
+    // Busca o relatório
+    const report = await prisma.report.findUnique({
+      where: { id: params.id },
     })
 
-    return NextResponse.json(reports)
-  } catch (error) {
-    console.error('Error fetching reports:', error)
-    return NextResponse.json(
-      { error: 'Erro ao buscar relatórios' },
-      { status: 500 }
-    )
-  }
-}
-
-// POST /api/reports - Criar novo relatório
-export async function POST(request: Request) {
-  try {
-    const session = await getServerSession(authOptions)
-
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
-    }
-
-    const userId = (session.user as any).id
-
-    const body = await request.json()
-    const { title, description, formId, filters, format } = body
-
-    // Valida campos obrigatórios
-    if (!title) {
+    if (!report) {
       return NextResponse.json(
-        { error: 'Título é obrigatório' },
-        { status: 400 }
+        { error: 'Relatório não encontrado' },
+        { status: 404 }
       )
     }
 
-    // Busca dados para o relatório
-    const whereClause = buildWhereClause(formId, filters)
+    // Reconstrói os filtros para buscar os dados
+    const whereClause = buildWhereClause(report.formId, report.filters as any)
 
     const responses = await prisma.response.findMany({
       where: whereClause,
@@ -98,39 +72,48 @@ export async function POST(request: Request) {
       },
     })
 
-    // Salva relatório no banco (sem os arquivos, apenas metadados)
-    const report = await prisma.report.create({
-      data: {
-        title,
-        description,
-        formId: formId || null,
-        filters: filters || null,
-        csvUrl: null, // URLs não são mais armazenadas
-        pdfUrl: null,
-        generatedBy: userId,
-      },
-      include: {
-        generator: {
-          select: {
-            name: true,
-            email: true,
-          },
-        },
-      },
-    })
+    // Gera arquivo baseado no formato
+    if (format === 'csv') {
+      const csv = generateReportCSV(responses as any, report.title)
 
-    // Retorna o relatório com os dados para o cliente processar
-    return NextResponse.json({
-      ...report,
-      responsesCount: responses.length,
-    })
-  } catch (error) {
-    console.error('Error creating report:', error)
+      // Retorna o CSV como arquivo para download
+      return new NextResponse(csv, {
+        headers: {
+          'Content-Type': 'text/csv; charset=utf-8',
+          'Content-Disposition': `attachment; filename="${sanitizeFilename(report.title)}.csv"`,
+        },
+      })
+    } else if (format === 'xlsx') {
+      const xlsx = generateReportXLSX(responses as any, report.title)
+
+      // Retorna o Excel como arquivo para download
+      return new NextResponse(xlsx, {
+        headers: {
+          'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          'Content-Disposition': `attachment; filename="${sanitizeFilename(report.title)}.xlsx"`,
+        },
+      })
+    }
+
     return NextResponse.json(
-      { error: 'Erro ao criar relatório' },
+      { error: 'Formato inválido. Use csv ou xlsx' },
+      { status: 400 }
+    )
+  } catch (error) {
+    console.error('Error exporting report:', error)
+    return NextResponse.json(
+      { error: 'Erro ao exportar relatório' },
       { status: 500 }
     )
   }
+}
+
+// Helper: Sanitiza nome do arquivo
+function sanitizeFilename(filename: string): string {
+  return filename
+    .replace(/[^a-z0-9_\-]/gi, '_')
+    .replace(/_+/g, '_')
+    .toLowerCase()
 }
 
 // Helper: Constrói WHERE clause baseado nos filtros

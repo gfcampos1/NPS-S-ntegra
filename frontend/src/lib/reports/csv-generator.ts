@@ -32,12 +32,12 @@ interface ResponseData {
 
 /**
  * Gera um arquivo CSV a partir das respostas
- * Retorna uma URL data: que pode ser usada para download
+ * Retorna o conteúdo CSV como string
  */
-export async function generateReportCSV(
+export function generateReportCSV(
   responses: ResponseData[],
   reportTitle: string
-): Promise<string> {
+): string {
   // Cabeçalhos do CSV
   const headers = [
     'ID Resposta',
@@ -104,11 +104,7 @@ export async function generateReportCSV(
   // Converte para CSV
   const csv = convertToCSV(headers, rows)
 
-  // Cria data URL
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-  const dataUrl = await blobToDataURL(blob)
-
-  return dataUrl
+  return csv
 }
 
 /**
@@ -162,18 +158,6 @@ function convertToCSV(headers: string[], rows: string[][]): string {
   const dataLines = rows.map((row) => row.map(escapeCsvValue).join(','))
 
   return [headerLine, ...dataLines].join('\n')
-}
-
-/**
- * Converte Blob para Data URL
- */
-function blobToDataURL(blob: Blob): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onload = () => resolve(reader.result as string)
-    reader.onerror = reject
-    reader.readAsDataURL(blob)
-  })
 }
 
 /**
