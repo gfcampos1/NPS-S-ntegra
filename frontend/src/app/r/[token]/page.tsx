@@ -14,6 +14,11 @@ type Question = {
   required: boolean
   options: string[] | null
   order: number
+  conditionalLogic?: {
+    dependsOn: string
+    condition: string
+    value: number | string
+  } | null
 }
 
 type Form = {
@@ -82,20 +87,56 @@ export default function SurveyResponsePage({ params }: { params: { token: string
     }
   }
 
+  // Verifica se uma pergunta é obrigatória (base ou condicional)
+  const isQuestionRequired = (question: Question): boolean => {
+    // Se é sempre obrigatória
+    if (question.required) return true
+
+    // Se tem lógica condicional
+    if (question.conditionalLogic) {
+      const { dependsOn, condition, value: expectedValue } = question.conditionalLogic
+      const actualValue = answers[dependsOn]
+
+      // Se a pergunta da qual depende não foi respondida ainda, não é obrigatória
+      if (actualValue === undefined || actualValue === null) return false
+
+      // Avalia a condição
+      const numericActual = typeof actualValue === 'number' ? actualValue : Number(actualValue)
+      const numericExpected = typeof expectedValue === 'number' ? expectedValue : Number(expectedValue)
+
+      switch (condition) {
+        case '<':
+          return numericActual < numericExpected
+        case '<=':
+          return numericActual <= numericExpected
+        case '==':
+          return actualValue == expectedValue // Comparação flexível
+        case '>=':
+          return numericActual >= numericExpected
+        case '>':
+          return numericActual > numericExpected
+        default:
+          return false
+      }
+    }
+
+    return false
+  }
+
   const handleAnswer = (questionId: string, value: any) => {
     const newAnswers = { ...answers, [questionId]: value }
     setAnswers(newAnswers)
-    
+
     // Auto-save progress
     saveProgress(newAnswers, false)
   }
 
   const handleNext = () => {
     if (!form) return
-    
+
     const currentQuestion = form.questions[currentQuestionIndex]
-    
-    if (currentQuestion.required && !answers[currentQuestion.id]) {
+
+    if (isQuestionRequired(currentQuestion) && !answers[currentQuestion.id]) {
       alert('Esta pergunta é obrigatória')
       return
     }
@@ -114,9 +155,9 @@ export default function SurveyResponsePage({ params }: { params: { token: string
   const handleSubmit = async () => {
     if (!form) return
 
-    // Check all required questions
+    // Check all required questions (base + conditional)
     const unansweredRequired = form.questions.filter(
-      (q) => q.required && !answers[q.id]
+      (q) => isQuestionRequired(q) && !answers[q.id]
     )
 
     if (unansweredRequired.length > 0) {
@@ -354,7 +395,7 @@ export default function SurveyResponsePage({ params }: { params: { token: string
               </p>
               <h2 className="text-xl font-semibold text-sintegra-gray-dark mb-2">
                 {currentQuestion.text}
-                {currentQuestion.required && (
+                {isQuestionRequired(currentQuestion) && (
                   <span className="text-red-500 ml-1">*</span>
                 )}
               </h2>
@@ -362,6 +403,11 @@ export default function SurveyResponsePage({ params }: { params: { token: string
                 <p className="text-sm text-sintegra-gray-medium">
                   {currentQuestion.description}
                 </p>
+              )}
+              {currentQuestion.conditionalLogic && isQuestionRequired(currentQuestion) && !currentQuestion.required && (
+                <div className="mt-2 p-2 bg-amber-50 border border-amber-200 rounded text-sm text-amber-800">
+                  Esta pergunta se tornou obrigatória baseada em sua resposta anterior
+                </div>
               )}
             </div>
 

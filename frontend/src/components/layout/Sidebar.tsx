@@ -17,6 +17,8 @@ import {
   Wrench,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
+  ChevronUp,
   LogOut,
   User,
 } from "lucide-react";
@@ -29,6 +31,13 @@ interface NavItem {
   adminOnly?: boolean;
 }
 
+interface SettingsSubItem {
+  name: string;
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+  superAdminOnly?: boolean;
+}
+
 const navItems: NavItem[] = [
   { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
   { name: "Formulários", href: "/admin/forms", icon: FileText },
@@ -37,8 +46,15 @@ const navItems: NavItem[] = [
   { name: "Relatórios", href: "/admin/reports", icon: BarChart3, adminOnly: true },
 ];
 
+const settingsSubItems: SettingsSubItem[] = [
+  { name: "Geral", href: "/admin/settings", icon: Settings },
+  { name: "Usuários", href: "/admin/settings/users", icon: UserCog, superAdminOnly: true },
+  { name: "Admin Setup", href: "/admin/settings/admin-setup", icon: Wrench, superAdminOnly: true },
+];
+
 export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
+  const [settingsExpanded, setSettingsExpanded] = useState(false);
   const pathname = usePathname();
   const { data: session } = useSession();
   const isAdmin = (session?.user as any)?.role === "SUPER_ADMIN" || (session?.user as any)?.role === "ADMIN";
@@ -47,6 +63,16 @@ export function Sidebar() {
   const filteredNavItems = navItems.filter(
     (item) => !item.adminOnly || isAdmin
   );
+
+  const filteredSettingsItems = settingsSubItems.filter(
+    (item) => !item.superAdminOnly || isSuperAdmin
+  );
+
+  // Auto-expand settings if user is on a settings page
+  const isOnSettingsPage = pathname.startsWith("/admin/settings");
+  if (isOnSettingsPage && !settingsExpanded) {
+    setSettingsExpanded(true);
+  }
 
   const handleSignOut = () => {
     signOut({ callbackUrl: "/login" });
@@ -149,59 +175,65 @@ export function Sidebar() {
 
         {/* User Profile & Settings */}
         <div className="border-t border-gray-200 p-3 space-y-2">
-          {/* Settings Link */}
-          <Link href="/admin/settings">
+          {/* Settings Section - Expandable */}
+          <div className="space-y-1">
             <button
+              onClick={() => !collapsed && setSettingsExpanded(!settingsExpanded)}
               className={cn(
                 "w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all",
                 "hover:bg-secondary-100",
-                "text-secondary-700"
+                "text-secondary-700",
+                isOnSettingsPage && "bg-secondary-100"
               )}
             >
               <Settings className="w-5 h-5 flex-shrink-0" />
               {!collapsed && (
-                <span className="text-sm font-medium">Configurações</span>
+                <>
+                  <span className="text-sm font-medium flex-1 text-left">Configurações</span>
+                  {settingsExpanded ? (
+                    <ChevronUp className="w-4 h-4 flex-shrink-0" />
+                  ) : (
+                    <ChevronDown className="w-4 h-4 flex-shrink-0" />
+                  )}
+                </>
               )}
             </button>
-          </Link>
 
-          {/* Users Management Link - Super Admin Only */}
-          {isSuperAdmin && (
-            <Link href="/admin/users">
-              <button
-                className={cn(
-                  "w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all",
-                  "hover:bg-blue-50",
-                  "text-blue-700",
-                  pathname === "/admin/users" && "bg-blue-100"
-                )}
-              >
-                <UserCog className="w-5 h-5 flex-shrink-0" />
-                {!collapsed && (
-                  <span className="text-sm font-medium">Usuários</span>
-                )}
-              </button>
-            </Link>
-          )}
+            {/* Settings Sub-items */}
+            <AnimatePresence>
+              {settingsExpanded && !collapsed && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="pl-4 space-y-1 overflow-hidden"
+                >
+                  {filteredSettingsItems.map((item) => {
+                    const isActive = pathname === item.href;
+                    const Icon = item.icon;
 
-          {/* Admin Setup Link - Super Admin Only */}
-          {isSuperAdmin && (
-            <Link href="/admin/admin-setup">
-              <button
-                className={cn(
-                  "w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all",
-                  "hover:bg-amber-50",
-                  "text-amber-700",
-                  pathname === "/admin/admin-setup" && "bg-amber-100"
-                )}
-              >
-                <Wrench className="w-5 h-5 flex-shrink-0" />
-                {!collapsed && (
-                  <span className="text-sm font-medium">Admin Setup</span>
-                )}
-              </button>
-            </Link>
-          )}
+                    return (
+                      <Link key={item.href} href={item.href}>
+                        <div
+                          className={cn(
+                            "flex items-center gap-3 px-3 py-2 rounded-lg transition-all",
+                            "hover:bg-secondary-50",
+                            isActive
+                              ? "bg-gradient-sintegra text-white shadow-sm"
+                              : "text-secondary-600"
+                          )}
+                        >
+                          <Icon className="w-4 h-4 flex-shrink-0" />
+                          <span className="text-sm">{item.name}</span>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
 
           {/* User Info */}
           {session?.user && (

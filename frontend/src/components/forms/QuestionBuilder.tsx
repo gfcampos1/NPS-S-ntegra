@@ -24,6 +24,7 @@ type Question = {
 type QuestionBuilderProps = {
   formId: string
   question?: Question | null
+  allQuestions?: Question[]
   onClose: () => void
   onSave: () => void
 }
@@ -37,11 +38,23 @@ const questionTypes = [
   { value: 'MULTIPLE_CHOICE', label: 'Multipla Escolha' },
   { value: 'SINGLE_CHOICE', label: 'Escolha Unica' },
 ]
-export function QuestionBuilder({ formId, question, onClose, onSave }: QuestionBuilderProps) {
+export function QuestionBuilder({ formId, question, allQuestions = [], onClose, onSave }: QuestionBuilderProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [options, setOptions] = useState<string[]>(question?.options || [])
   const [newOption, setNewOption] = useState('')
+
+  // Estado para lógica condicional
+  const [hasConditionalLogic, setHasConditionalLogic] = useState(!!question?.conditionalLogic)
+  const [conditionalDependsOn, setConditionalDependsOn] = useState(
+    question?.conditionalLogic?.dependsOn || ''
+  )
+  const [conditionalCondition, setConditionalCondition] = useState(
+    question?.conditionalLogic?.condition || '<='
+  )
+  const [conditionalValue, setConditionalValue] = useState(
+    question?.conditionalLogic?.value?.toString() || ''
+  )
 
   const {
     register,
@@ -91,6 +104,17 @@ export function QuestionBuilder({ formId, question, onClose, onSave }: QuestionB
       // Add optional fields only if they have values
       if (data.description) {
         payload.description = data.description
+      }
+
+      // Adiciona lógica condicional se configurada
+      if (hasConditionalLogic && conditionalDependsOn && conditionalValue) {
+        payload.conditionalLogic = {
+          dependsOn: conditionalDependsOn,
+          condition: conditionalCondition,
+          value: isNaN(Number(conditionalValue)) ? conditionalValue : Number(conditionalValue),
+        }
+      } else {
+        payload.conditionalLogic = null
       }
 
       switch (data.type) {
@@ -281,6 +305,84 @@ export function QuestionBuilder({ formId, question, onClose, onSave }: QuestionB
               </div>
             )}
 
+            {/* Seção de Lógica Condicional */}
+            <div className="border-t pt-4 space-y-4">
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="hasConditionalLogic"
+                  checked={hasConditionalLogic}
+                  onChange={(e) => setHasConditionalLogic(e.target.checked)}
+                  className="rounded border-gray-300 text-sintegra-blue focus:ring-sintegra-blue"
+                />
+                <Label htmlFor="hasConditionalLogic" className="cursor-pointer font-semibold">
+                  Tornar obrigatória condicionalmente
+                </Label>
+              </div>
+
+              {hasConditionalLogic && (
+                <div className="ml-6 p-4 bg-blue-50 rounded-lg space-y-3">
+                  <p className="text-sm text-gray-700 mb-3">
+                    Esta pergunta se tornará obrigatória quando a condição abaixo for atendida:
+                  </p>
+
+                  <div className="space-y-2">
+                    <Label>Depende da pergunta:</Label>
+                    <select
+                      value={conditionalDependsOn}
+                      onChange={(e) => setConditionalDependsOn(e.target.value)}
+                      className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sintegra-blue"
+                    >
+                      <option value="">Selecione uma pergunta...</option>
+                      {allQuestions
+                        .filter((q) => q.id !== question?.id) // Não pode depender de si mesma
+                        .sort((a, b) => a.order - b.order)
+                        .map((q) => (
+                          <option key={q.id} value={q.id}>
+                            #{q.order} - {q.text}
+                          </option>
+                        ))}
+                    </select>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-2">
+                      <Label>Condição:</Label>
+                      <select
+                        value={conditionalCondition}
+                        onChange={(e) => setConditionalCondition(e.target.value)}
+                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sintegra-blue"
+                      >
+                        <option value="<">Menor que (&lt;)</option>
+                        <option value="<=">Menor ou igual (≤)</option>
+                        <option value="==">Igual (=)</option>
+                        <option value=">=">Maior ou igual (≥)</option>
+                        <option value=">">Maior que (&gt;)</option>
+                      </select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Valor:</Label>
+                      <Input
+                        value={conditionalValue}
+                        onChange={(e) => setConditionalValue(e.target.value)}
+                        placeholder="Ex: 3"
+                        type="text"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="bg-white p-3 rounded border border-blue-200">
+                    <p className="text-xs text-gray-600">
+                      <strong>Exemplo:</strong> Se você configurar para "NPS ≤ 3", esta pergunta
+                      se tornará obrigatória apenas quando o respondente der uma nota de 0 a 3
+                      na pergunta NPS selecionada.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+
             <div className="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -289,7 +391,7 @@ export function QuestionBuilder({ formId, question, onClose, onSave }: QuestionB
                 className="rounded border-gray-300 text-sintegra-blue focus:ring-sintegra-blue"
               />
               <Label htmlFor="required" className="cursor-pointer">
-                Pergunta obrigatoria
+                Sempre obrigatória (independente de condições)
               </Label>
             </div>
 

@@ -3,7 +3,9 @@
 import { useEffect, useState } from 'react'
 import { TextResponsesViewer } from '@/components/dashboard/TextResponsesViewer'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Loader2, MessageSquare, FileText, Filter } from 'lucide-react'
+import { Loader2, MessageSquare, FileText, Filter, Calendar, ClipboardList } from 'lucide-react'
+import { formatDistanceToNow, format } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 
 interface TextQuestion {
   id: string
@@ -248,38 +250,97 @@ export default function FeedbacksPage() {
         </Card>
       ) : (
         <div className="space-y-6">
-          {filteredQuestions.map((question) => (
-            <div key={question.id}>
-              {/* Info do Formulário */}
-              <div className="mb-3 px-4 py-2 bg-gray-50 rounded-lg border border-gray-200">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-sm">
-                    <FileText className="w-4 h-4 text-gray-400" />
-                    <span className="font-medium text-gray-700">
-                      {question.formTitle}
-                    </span>
-                    <span className="text-gray-400">•</span>
-                    <span className="text-gray-600">
-                      {question.type === 'TEXT_SHORT'
-                        ? 'Texto Curto'
-                        : 'Texto Longo'}
-                    </span>
-                  </div>
-                  <span className="text-xs text-gray-500">
-                    {question.totalResponses} resposta
-                    {question.totalResponses !== 1 ? 's' : ''}
-                  </span>
-                </div>
-              </div>
+          {filteredQuestions.map((question) => {
+            // Agrupa respostas por formulário para melhor organização
+            const formTypeLabels: Record<string, string> = {
+              MEDICOS: 'Médicos',
+              DISTRIBUIDORES: 'Distribuidores',
+              CUSTOM: 'Personalizado'
+            }
 
-              {/* Componente de Visualização */}
-              <TextResponsesViewer
-                questionText={question.text}
-                questionType={question.type}
-                responses={question.responses}
-              />
-            </div>
-          ))}
+            // Calcula a resposta mais recente e mais antiga
+            const sortedDates = question.responses
+              .map(r => new Date(r.completedAt))
+              .sort((a, b) => b.getTime() - a.getTime())
+
+            const mostRecentDate = sortedDates[0]
+            const oldestDate = sortedDates[sortedDates.length - 1]
+
+            return (
+              <Card key={question.id} className="overflow-hidden">
+                {/* Cabeçalho com info do formulário */}
+                <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
+                  <div className="space-y-3">
+                    {/* Título do Formulário */}
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex items-start gap-3 flex-1">
+                        <div className="w-10 h-10 rounded-lg bg-white shadow-sm flex items-center justify-center flex-shrink-0">
+                          <ClipboardList className="w-5 h-5 text-blue-600" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="text-lg font-semibold text-gray-900">
+                            {question.formTitle}
+                          </h3>
+                          <div className="flex flex-wrap items-center gap-2 mt-1">
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                              {formTypeLabels[question.formType] || question.formType}
+                            </span>
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                              {question.type === 'TEXT_SHORT' ? 'Texto Curto' : 'Texto Longo'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Contador de respostas */}
+                      <div className="text-right flex-shrink-0">
+                        <div className="text-2xl font-bold text-gray-900">
+                          {question.totalResponses}
+                        </div>
+                        <div className="text-xs text-gray-600">
+                          {question.totalResponses === 1 ? 'resposta' : 'respostas'}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Informações de data */}
+                    {mostRecentDate && (
+                      <div className="flex flex-wrap items-center gap-4 text-sm">
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <Calendar className="w-4 h-4" />
+                          <span className="font-medium">Mais recente:</span>
+                          <span>
+                            {format(mostRecentDate, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                          </span>
+                          <span className="text-gray-500">
+                            ({formatDistanceToNow(mostRecentDate, { addSuffix: true, locale: ptBR })})
+                          </span>
+                        </div>
+
+                        {question.totalResponses > 1 && oldestDate && (
+                          <div className="flex items-center gap-2 text-gray-600">
+                            <span className="font-medium">Mais antiga:</span>
+                            <span>
+                              {format(oldestDate, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </CardHeader>
+
+                {/* Corpo com as respostas */}
+                <CardContent className="pt-6">
+                  <TextResponsesViewer
+                    questionText={question.text}
+                    questionType={question.type}
+                    responses={question.responses}
+                  />
+                </CardContent>
+              </Card>
+            )
+          })}
         </div>
       )}
     </div>

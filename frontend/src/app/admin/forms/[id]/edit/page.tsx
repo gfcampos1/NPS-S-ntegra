@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { ArrowLeft, Plus, Trash2, GripVertical, Edit } from 'lucide-react'
+import { ArrowLeft, Plus, Trash2, GripVertical, Edit, ChevronUp, ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { QuestionBuilder } from '@/components/forms/QuestionBuilder'
 import { FormPreview } from '@/components/forms/FormPreview'
@@ -111,11 +111,44 @@ export default function EditFormPage({ params }: { params: { id: string } }) {
       })
 
       if (!response.ok) throw new Error('Erro ao excluir pergunta')
-      
+
       router.refresh()
       await fetchForm()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao excluir pergunta')
+    }
+  }
+
+  const handleMoveQuestion = async (questionId: string, direction: 'up' | 'down') => {
+    if (!form) return
+
+    const questionIndex = form.questions.findIndex(q => q.id === questionId)
+    if (questionIndex === -1) return
+
+    const targetIndex = direction === 'up' ? questionIndex - 1 : questionIndex + 1
+    if (targetIndex < 0 || targetIndex >= form.questions.length) return
+
+    const currentQuestion = form.questions[questionIndex]
+    const targetQuestion = form.questions[targetIndex]
+
+    try {
+      // Atualiza a ordem das duas perguntas
+      await Promise.all([
+        fetch(`/api/questions/${currentQuestion.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ order: targetQuestion.order }),
+        }),
+        fetch(`/api/questions/${targetQuestion.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ order: currentQuestion.order }),
+        }),
+      ])
+
+      await fetchForm()
+    } catch (err) {
+      setError('Erro ao reordenar perguntas')
     }
   }
 
@@ -283,6 +316,27 @@ export default function EditFormPage({ params }: { params: { id: string } }) {
                         </p>
                       </div>
                       <div className="flex gap-1">
+                        {/* Botões de reordenação */}
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => handleMoveQuestion(question.id, 'up')}
+                          disabled={index === 0}
+                          title="Mover para cima"
+                        >
+                          <ChevronUp className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => handleMoveQuestion(question.id, 'down')}
+                          disabled={index === form.questions.length - 1}
+                          title="Mover para baixo"
+                        >
+                          <ChevronDown className="h-4 w-4" />
+                        </Button>
+
+                        {/* Botão de editar */}
                         <Button
                           size="icon"
                           variant="ghost"
@@ -290,13 +344,17 @@ export default function EditFormPage({ params }: { params: { id: string } }) {
                             setEditingQuestion(question)
                             setShowQuestionBuilder(true)
                           }}
+                          title="Editar pergunta"
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
+
+                        {/* Botão de deletar */}
                         <Button
                           size="icon"
                           variant="ghost"
                           onClick={() => handleDeleteQuestion(question.id)}
+                          title="Excluir pergunta"
                         >
                           <Trash2 className="h-4 w-4 text-red-500" />
                         </Button>
@@ -319,6 +377,7 @@ export default function EditFormPage({ params }: { params: { id: string } }) {
         <QuestionBuilder
           formId={form.id}
           question={editingQuestion}
+          allQuestions={form.questions}
           onClose={() => {
             setShowQuestionBuilder(false)
             setEditingQuestion(null)
