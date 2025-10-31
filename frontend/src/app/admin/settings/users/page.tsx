@@ -15,9 +15,17 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { Users, Shield, Crown, Eye, ArrowUp, ArrowDown, Trash2, Loader2 } from 'lucide-react'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { Users, Shield, Crown, Eye, ArrowUp, ArrowDown, Trash2, Loader2, KeyRound, Copy, Check } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import { useSession } from 'next-auth/react'
 
 interface User {
   id: string
@@ -25,6 +33,7 @@ interface User {
   email: string
   role: 'SUPER_ADMIN' | 'ADMIN' | 'VIEWER'
   createdAt: string
+  requirePasswordChange?: boolean
 }
 
 const roleLabels = {
@@ -46,11 +55,25 @@ const roleIcons = {
 }
 
 export default function UsersPage() {
+  const { data: session } = useSession()
   const [users, setUsers] = useState<User[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [updatingUserId, setUpdatingUserId] = useState<string | null>(null)
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null)
+  const [resettingUserId, setResettingUserId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [tempPasswordDialog, setTempPasswordDialog] = useState<{
+    open: boolean
+    userName: string
+    tempPassword: string
+  }>({
+    open: false,
+    userName: '',
+    tempPassword: ''
+  })
+  const [copiedPassword, setCopiedPassword] = useState(false)
+  
+  const isSuperAdmin = session?.user?.role === 'SUPER_ADMIN'
 
   useEffect(() => {
     loadUsers()
@@ -118,6 +141,44 @@ export default function UsersPage() {
     } finally {
       setDeletingUserId(null)
     }
+  }
+
+  const resetUserPassword = async (userId: string, userName: string) => {
+    setResettingUserId(userId)
+    setError(null)
+
+    try {
+      const response = await fetch(`/api/users/${userId}/reset-password`, {
+        method: 'POST',
+      })
+
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error || 'Erro ao resetar senha')
+      }
+
+      const data = await response.json()
+      
+      // Exibe a senha temporária no modal
+      setTempPasswordDialog({
+        open: true,
+        userName,
+        tempPassword: data.tempPassword
+      })
+
+      await loadUsers()
+    } catch (error: any) {
+      console.error('Error resetting password:', error)
+      setError(error.message || 'Erro ao resetar senha')
+    } finally {
+      setResettingUserId(null)
+    }
+  }
+
+  const copyPasswordToClipboard = () => {
+    navigator.clipboard.writeText(tempPasswordDialog.tempPassword)
+    setCopiedPassword(true)
+    setTimeout(() => setCopiedPassword(false), 2000)
   }
 
   const getNextRole = (currentRole: string): 'SUPER_ADMIN' | 'ADMIN' | 'VIEWER' | null => {
@@ -241,6 +302,11 @@ export default function UsersPage() {
                                 >
                                   {roleLabels[user.role]}
                                 </span>
+                                {user.requirePasswordChange && (
+                                  <span className="text-xs px-2 py-1 rounded-full font-medium bg-amber-100 text-amber-800">
+                                    Precisa alterar senha
+                                  </span>
+                                )}
                               </div>
                               <p className="text-sm text-gray-600">{user.email}</p>
                               <p className="text-xs text-gray-500 mt-1">
@@ -253,6 +319,50 @@ export default function UsersPage() {
                             </div>
 
                             <div className="flex gap-2">
+                              {/* Reset de Senha - Apenas Super Admin */}
+                              {isSuperAdmin && (
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      disabled={isUpdating || isDeleting || resettingUserId === user.id}
+                                      className="border-blue-300 hover:bg-blue-50"
+                                    >
+                                      {resettingUserId === user.id ? (
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                      ) : (
+                                        <>
+                                          <KeyRound className="h-4 w-4 mr-1" />
+                                          Resetar Senha
+                                        </>
+                                      )}
+                                    </Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>Resetar senha do usuário</AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        Uma senha temporária será gerada para <strong>{user.name}</strong>.
+                                        O usuário será obrigado a alterar a senha no próximo login.
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                      <AlertDialogAction
+                                        onClick={(e) => {
+                                          e.preventDefault()
+                                          resetUserPassword(user.id, user.name)
+                                        }}
+                                        className="bg-blue-600 hover:bg-blue-700"
+                                      >
+                                        Resetar Senha
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
+                              )}
+
                               {/* Promover */}
                               {nextRole && (
                                 <AlertDialog>
@@ -420,6 +530,68 @@ export default function UsersPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Modal de Senha Temporária */}
+      <Dialog open={tempPasswordDialog.open} onOpenChange={(open: boolean) => {
+        setTempPasswordDialog(prev => ({ ...prev, open }))
+        if (!open) setCopiedPassword(false)
+      }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Senha Temporária Gerada</DialogTitle>
+            <DialogDescription>
+              A senha temporária para <strong>{tempPasswordDialog.userName}</strong> foi gerada com sucesso.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <Alert className="bg-amber-50 border-amber-200">
+              <AlertDescription className="text-sm">
+                <strong>Importante:</strong> Esta senha só será exibida uma vez. Certifique-se de enviá-la ao usuário antes de fechar esta janela.
+              </AlertDescription>
+            </Alert>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Senha Temporária:</label>
+              <div className="flex gap-2">
+                <div className="flex-1 p-3 bg-gray-100 rounded-lg font-mono text-lg break-all">
+                  {tempPasswordDialog.tempPassword}
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={copyPasswordToClipboard}
+                  className="flex-shrink-0"
+                >
+                  {copiedPassword ? (
+                    <>
+                      <Check className="h-4 w-4 mr-1 text-green-600" />
+                      Copiado!
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="h-4 w-4 mr-1" />
+                      Copiar
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+
+            <Alert>
+              <AlertDescription className="text-sm">
+                O usuário será obrigado a alterar esta senha no próximo login.
+              </AlertDescription>
+            </Alert>
+          </div>
+
+          <div className="flex justify-end">
+            <Button onClick={() => setTempPasswordDialog({ open: false, userName: '', tempPassword: '' })}>
+              Fechar
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

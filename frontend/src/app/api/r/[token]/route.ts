@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { rateLimit } from '@/lib/rate-limit'
+import { safeJsonParse } from '@/lib/utils'
 
 function parseStoredAnswer(answer: any) {
   if (!answer) return null
@@ -15,12 +17,9 @@ function parseStoredAnswer(answer: any) {
       return answer.textValue ?? ''
     case 'MULTIPLE_CHOICE': {
       if (!answer.textValue) return []
-      try {
-        const parsed = JSON.parse(answer.textValue)
-        return Array.isArray(parsed) ? parsed : []
-      } catch {
-        return []
-      }
+      // Usar safeJsonParse para evitar crashes (CWE-20)
+      const parsed = safeJsonParse<string[]>(answer.textValue, [])
+      return Array.isArray(parsed) ? parsed : []
     }
     case 'SINGLE_CHOICE':
     case 'COMPARISON':
@@ -35,6 +34,20 @@ export async function GET(
   { params }: { params: { token: string } }
 ) {
   try {
+    // Rate limiting: 10 tentativas por minuto por IP (CWE-862)
+    const limiter = rateLimit(request, { max: 10, windowMs: 60000 })
+
+    if (!limiter.success) {
+      const retryAfter = Math.ceil((limiter.resetAt - Date.now()) / 1000)
+      return NextResponse.json(
+        { error: 'Muitas tentativas. Aguarde alguns instantes.' },
+        {
+          status: 429,
+          headers: { 'Retry-After': retryAfter.toString() },
+        }
+      )
+    }
+
     const response = await prisma.response.findUnique({
       where: { uniqueToken: params.token },
       include: {
@@ -64,15 +77,52 @@ export async function GET(
     })
 
     if (!response) {
+      // Aguardar tempo aleatório para evitar timing attacks (CWE-200)
+      await new Promise((resolve) =>
+        setTimeout(resolve, Math.random() * 1000 + 500)
+      )
       return NextResponse.json(
-        { error: 'Token invalido ou expirado' },
+        { error: 'Token inválido ou expirado' },
         { status: 404 }
       )
     }
 
+    // Validação de expiração do formulário (CWE-862)
+    if (response.form.expiresAt && response.form.expiresAt < new Date()) {
+      return NextResponse.json(
+        { error: 'Este formulário expirou', expired: true },
+        { status: 410 } // 410 Gone
+      )
+    }
+
+    // Validação de status do formulário (CWE-862)
+    if (response.form.status !== 'PUBLISHED') {
+      return NextResponse.json(
+        { error: 'Este formulário não está mais disponível' },
+        { status: 403 }
+      )
+    }
+
+    // Validação de limite de respostas (CWE-862)
+    if (response.form.maxResponses) {
+      const responseCount = await prisma.response.count({
+        where: {
+          formId: response.form.id,
+          status: 'COMPLETED',
+        },
+      })
+
+      if (responseCount >= response.form.maxResponses) {
+        return NextResponse.json(
+          { error: 'Limite de respostas atingido para este formulário' },
+          { status: 403 }
+        )
+      }
+    }
+
     if (response.status === 'COMPLETED') {
       return NextResponse.json(
-        { error: 'Pesquisa ja respondida', completed: true },
+        { error: 'Pesquisa já respondida', completed: true },
         { status: 400 }
       )
     }
@@ -91,7 +141,7 @@ export async function GET(
   } catch (error) {
     console.error('Error fetching form by token:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Erro interno do servidor' },
       { status: 500 }
     )
   }
@@ -171,6 +221,20 @@ export async function POST(
   { params }: { params: { token: string } }
 ) {
   try {
+    // Rate limiting: 20 submissions por minuto por IP (CWE-862)
+    const limiter = rateLimit(request, { max: 20, windowMs: 60000 })
+
+    if (!limiter.success) {
+      const retryAfter = Math.ceil((limiter.resetAt - Date.now()) / 1000)
+      return NextResponse.json(
+        { error: 'Muitas tentativas. Aguarde alguns instantes.' },
+        {
+          status: 429,
+          headers: { 'Retry-After': retryAfter.toString() },
+        }
+      )
+    }
+
     const body = await request.json()
     const { answers = {}, completed = false } = body as {
       answers: Record<string, any>
@@ -189,15 +253,28 @@ export async function POST(
     })
 
     if (!response) {
+      return NextResponse.json({ error: 'Token inválido' }, { status: 404 })
+    }
+
+    // Validação de expiração (CWE-862)
+    if (response.form.expiresAt && response.form.expiresAt < new Date()) {
       return NextResponse.json(
-        { error: 'Token invalido' },
-        { status: 404 }
+        { error: 'Este formulário expirou' },
+        { status: 410 }
+      )
+    }
+
+    // Validação de status (CWE-862)
+    if (response.form.status !== 'PUBLISHED') {
+      return NextResponse.json(
+        { error: 'Este formulário não está mais disponível' },
+        { status: 403 }
       )
     }
 
     if (response.status === 'COMPLETED') {
       return NextResponse.json(
-        { error: 'Pesquisa ja respondida' },
+        { error: 'Pesquisa já respondida' },
         { status: 400 }
       )
     }
@@ -302,7 +379,7 @@ export async function POST(
   } catch (error) {
     console.error('Error saving response:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Erro interno do servidor' },
       { status: 500 }
     )
   }

@@ -38,7 +38,7 @@ const nextConfig = {
           },
           {
             key: 'X-Frame-Options',
-            value: 'SAMEORIGIN'
+            value: 'DENY'  // Mais restritivo que SAMEORIGIN
           },
           {
             key: 'X-Content-Type-Options',
@@ -50,7 +50,27 @@ const nextConfig = {
           },
           {
             key: 'Referrer-Policy',
-            value: 'origin-when-cross-origin'
+            value: 'strict-origin-when-cross-origin'
+          },
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=()'
+          },
+          // Content Security Policy completo (CWE-16)
+          {
+            key: 'Content-Security-Policy',
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline'", // Next.js precisa de unsafe-inline
+              "style-src 'self' 'unsafe-inline'", // Tailwind precisa de unsafe-inline
+              "img-src 'self' data: https://res.cloudinary.com",
+              "font-src 'self' data:",
+              "connect-src 'self' https://*.railway.app",
+              "frame-ancestors 'none'",
+              "base-uri 'self'",
+              "form-action 'self'",
+              "upgrade-insecure-requests",
+            ].join('; ')
           },
         ],
       },

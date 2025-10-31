@@ -15,21 +15,25 @@ datasource db {
 // ==========================================
 
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  name          String
-  password      String    // Hash bcrypt
-  role          Role      @default(ADMIN)
-  avatar        String?
+  id                    String                 @id @default(cuid())
+  email                 String                 @unique
+  name                  String
+  password              String                 // Hash bcrypt
+  role                  Role                   @default(ADMIN)
+  avatar                String?
   
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  lastLogin     DateTime?
+  // Recuperação de senha
+  tempPassword          String?                // Senha temporária visível ao admin
+  requirePasswordChange Boolean                @default(false) // Força troca de senha
+  
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  lastLogin             DateTime?
   
   // Relações
-  forms         Form[]
-  reports       Report[]
-  auditLogs     AuditLog[]
+  forms                 Form[]
+  reports               Report[]
+  auditLogs             AuditLog[]
   
   @@index([email])
   @@map("users")
