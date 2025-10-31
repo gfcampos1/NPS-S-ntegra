@@ -81,19 +81,45 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       if (user) {
         token.id = user.id
         token.role = user.role
         token.requirePasswordChange = (user as any).requirePasswordChange || false
       }
+      
+      // Atualizar token se houver atualização na sessão
+      if (trigger === 'update') {
+        const updatedUser = await prisma.user.findUnique({
+          where: { id: token.id as string },
+          select: { 
+            id: true, 
+            role: true, 
+            requirePasswordChange: true 
+          },
+        })
+        
+        if (updatedUser) {
+          token.requirePasswordChange = updatedUser.requirePasswordChange
+        }
+      }
+      
       return token
     },
     async session({ session, token }) {
       if (session.user) {
+        // Buscar valor atualizado do banco para garantir sincronização
+        const user = await prisma.user.findUnique({
+          where: { id: token.id as string },
+          select: { 
+            requirePasswordChange: true,
+            role: true 
+          },
+        })
+        
         session.user.id = token.id as string
-        session.user.role = token.role as string
-        session.user.requirePasswordChange = token.requirePasswordChange as boolean
+        session.user.role = user?.role || (token.role as string)
+        session.user.requirePasswordChange = user?.requirePasswordChange || false
       }
       return session
     },

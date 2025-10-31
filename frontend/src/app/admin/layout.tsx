@@ -3,6 +3,7 @@
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
+import { PasswordChangeGuard } from '@/components/PasswordChangeGuard'
 
 export default function AdminLayout({
   children,
@@ -31,8 +32,10 @@ export default function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <main className="container mx-auto p-6">{children}</main>
-    </div>
+    <PasswordChangeGuard>
+      <div className="min-h-screen bg-gray-50">
+        <main className="container mx-auto p-6">{children}</main>
+      </div>
+    </PasswordChangeGuard>
   )
 }

@@ -6,10 +6,14 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { UserManagement } from '@/components/settings/UserManagement'
+import { ChangePasswordSection } from '@/components/settings/ChangePasswordSection'
 
 export default function SettingsPage() {
   return (
     <div className="p-6 space-y-6">
+      {/* Seção de Alterar Senha */}
+      <ChangePasswordSection />
+
       <Card>
         <CardHeader>
           <CardTitle>Gestão de usuários</CardTitle>
