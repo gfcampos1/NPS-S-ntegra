@@ -1,5 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { DeleteRespondentButton } from '@/components/respondents/DeleteRespondentButton'
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
 import { formatDistanceToNow } from 'date-fns'
@@ -187,6 +188,11 @@ export default async function RespondentsPage() {
                       <Link href={`/admin/respondents/${respondent.id}/edit`}>
                         <Button size="sm">Editar</Button>
                       </Link>
+                      <DeleteRespondentButton
+                        respondentId={respondent.id}
+                        respondentName={respondent.name}
+                        hasResponses={respondent._count.responses > 0}
+                      />
                     </div>
                   </div>
                 ))}
