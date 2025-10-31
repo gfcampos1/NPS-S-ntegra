@@ -331,17 +331,23 @@ export function QuestionBuilder({ formId, question, allQuestions = [], onClose, 
                     <select
                       value={conditionalDependsOn}
                       onChange={(e) => setConditionalDependsOn(e.target.value)}
-                      className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sintegra-blue"
+                      className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sintegra-blue overflow-hidden text-ellipsis"
                     >
                       <option value="">Selecione uma pergunta...</option>
                       {allQuestions
                         .filter((q) => q.id !== question?.id) // Não pode depender de si mesma
                         .sort((a, b) => a.order - b.order)
-                        .map((q) => (
-                          <option key={q.id} value={q.id}>
-                            #{q.order} - {q.text}
-                          </option>
-                        ))}
+                        .map((q) => {
+                          // Limita o texto a 60 caracteres
+                          const truncatedText = q.text.length > 60
+                            ? q.text.substring(0, 60) + '...'
+                            : q.text
+                          return (
+                            <option key={q.id} value={q.id}>
+                              #{q.order} - {truncatedText}
+                            </option>
+                          )
+                        })}
                     </select>
                   </div>
 
