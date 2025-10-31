@@ -127,7 +127,7 @@ export async function DELETE(
       }),
       // Deleta os reports
       prisma.report.deleteMany({
-        where: { createdBy: params.id },
+        where: { generatedBy: params.id },
       }),
       // Deleta os forms (que automaticamente deletará questions, responses, etc devido ao cascade)
       prisma.form.deleteMany({
