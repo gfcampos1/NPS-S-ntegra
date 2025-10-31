@@ -98,15 +98,55 @@ export async function DELETE(
   }
 
   try {
-    await prisma.user.delete({
+    // Verifica se o usuário existe
+    const user = await prisma.user.findUnique({
       where: { id: params.id },
+      include: {
+        _count: {
+          select: {
+            forms: true,
+            reports: true,
+            auditLogs: true,
+          },
+        },
+      },
     })
 
-    return NextResponse.json({ success: true })
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Usuário não encontrado' },
+        { status: 404 }
+      )
+    }
+
+    // Deleta as relações primeiro (em ordem de dependência)
+    await prisma.$transaction([
+      // Deleta os audit logs
+      prisma.auditLog.deleteMany({
+        where: { userId: params.id },
+      }),
+      // Deleta os reports
+      prisma.report.deleteMany({
+        where: { createdBy: params.id },
+      }),
+      // Deleta os forms (que automaticamente deletará questions, responses, etc devido ao cascade)
+      prisma.form.deleteMany({
+        where: { createdBy: params.id },
+      }),
+      // Finalmente deleta o usuário
+      prisma.user.delete({
+        where: { id: params.id },
+      }),
+    ])
+
+    return NextResponse.json({
+      success: true,
+      message: `Usuário removido com sucesso. ${user._count.forms} formulários, ${user._count.reports} relatórios e ${user._count.auditLogs} logs foram removidos.`
+    })
   } catch (error) {
     console.error('Error deleting user:', error)
     return NextResponse.json(
-      { error: 'Erro ao remover usuário' },
+      { error: 'Erro ao remover usuário. Por favor, tente novamente.' },
       { status: 500 }
     )
   }
