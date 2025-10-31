@@ -87,7 +87,8 @@ export async function GET(
       const xlsx = generateReportXLSX(responses as any, report.title)
 
       // Retorna o Excel como arquivo para download
-      return new NextResponse(xlsx, {
+      // Converte Buffer para Uint8Array que é aceito pelo NextResponse
+      return new NextResponse(new Uint8Array(xlsx), {
         headers: {
           'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
           'Content-Disposition': `attachment; filename="${sanitizeFilename(report.title)}.xlsx"`,
