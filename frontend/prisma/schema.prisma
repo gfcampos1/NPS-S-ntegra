@@ -260,7 +260,7 @@ model Answer {
   response      Response  @relation(fields: [responseId], references: [id], onDelete: Cascade)
   
   questionId    String
-  question      Question  @relation(fields: [questionId], references: [id])
+  question      Question  @relation(fields: [questionId], references: [id], onDelete: Cascade)
   
   // Valores (usar o campo apropriado conforme tipo)
   numericValue  Int?      // Para ratings e NPS
