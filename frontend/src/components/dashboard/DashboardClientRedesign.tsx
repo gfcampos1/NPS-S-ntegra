@@ -200,7 +200,7 @@ export function DashboardClientRedesign({ data }: { data: DashboardData }) {
         </Card>
 
         {/* KPIs Principais */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Pesquisas Realizadas */}
           <motion.div
             custom={0}
@@ -208,27 +208,27 @@ export function DashboardClientRedesign({ data }: { data: DashboardData }) {
             animate="visible"
             variants={cardVariants}
           >
-            <Card className="border-none shadow-lg bg-sintegra-blue text-white hover:shadow-xl transition-shadow duration-300">
-              <CardContent className="p-8">
+            <Card className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
+              <CardContent className="p-5">
                 <div className="flex items-start justify-between">
-                  <div className="space-y-3 flex-1">
-                    <div className="flex items-center gap-2 opacity-90">
-                      <FileText className="h-5 w-5" />
-                      <p className="text-sm font-medium uppercase tracking-wide">
+                  <div className="space-y-2 flex-1">
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <FileText className="h-4 w-4" />
+                      <p className="text-xs font-medium uppercase tracking-wide">
                         Pesquisas Realizadas
                       </p>
                     </div>
                     <div className="space-y-1">
-                      <h3 className="text-5xl font-bold">
+                      <h3 className="text-4xl font-bold text-sintegra-blue">
                         {filteredData.totalResponses}
                       </h3>
-                      <p className="text-sm opacity-80">
+                      <p className="text-xs text-gray-500">
                         Total de respostas concluídas
                       </p>
                     </div>
                   </div>
-                  <div className="bg-white/20 p-4 rounded-2xl">
-                    <TrendingUp className="h-8 w-8" />
+                  <div className="text-sintegra-blue/20">
+                    <TrendingUp className="h-6 w-6" />
                   </div>
                 </div>
               </CardContent>
@@ -242,27 +242,27 @@ export function DashboardClientRedesign({ data }: { data: DashboardData }) {
             animate="visible"
             variants={cardVariants}
           >
-            <Card className="border-none shadow-lg bg-primary-700 text-white hover:shadow-xl transition-shadow duration-300">
-              <CardContent className="p-8">
+            <Card className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
+              <CardContent className="p-5">
                 <div className="flex items-start justify-between">
-                  <div className="space-y-3 flex-1">
-                    <div className="flex items-center gap-2 opacity-90">
-                      <FileText className="h-5 w-5" />
-                      <p className="text-sm font-medium uppercase tracking-wide">
+                  <div className="space-y-2 flex-1">
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <FileText className="h-4 w-4" />
+                      <p className="text-xs font-medium uppercase tracking-wide">
                         Formulários Cadastrados
                       </p>
                     </div>
                     <div className="space-y-1">
-                      <h3 className="text-5xl font-bold">
+                      <h3 className="text-4xl font-bold text-primary-700">
                         {data.totalForms}
                       </h3>
-                      <p className="text-sm opacity-80">
+                      <p className="text-xs text-gray-500">
                         Total de formulários ativos
                       </p>
                     </div>
                   </div>
-                  <div className="bg-white/20 p-4 rounded-2xl">
-                    <FileText className="h-8 w-8" />
+                  <div className="text-primary-700/20">
+                    <FileText className="h-6 w-6" />
                   </div>
                 </div>
               </CardContent>
@@ -276,27 +276,27 @@ export function DashboardClientRedesign({ data }: { data: DashboardData }) {
             animate="visible"
             variants={cardVariants}
           >
-            <Card className="border-none shadow-lg bg-primary-800 text-white hover:shadow-xl transition-shadow duration-300">
-              <CardContent className="p-8">
+            <Card className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
+              <CardContent className="p-5">
                 <div className="flex items-start justify-between">
-                  <div className="space-y-3 flex-1">
-                    <div className="flex items-center gap-2 opacity-90">
-                      <Users className="h-5 w-5" />
-                      <p className="text-sm font-medium uppercase tracking-wide">
+                  <div className="space-y-2 flex-1">
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <Users className="h-4 w-4" />
+                      <p className="text-xs font-medium uppercase tracking-wide">
                         Respondentes Cadastrados
                       </p>
                     </div>
                     <div className="space-y-1">
-                      <h3 className="text-5xl font-bold">
+                      <h3 className="text-4xl font-bold text-primary-800">
                         {data.totalRespondents}
                       </h3>
-                      <p className="text-sm opacity-80">
+                      <p className="text-xs text-gray-500">
                         Total de contatos cadastrados
                       </p>
                     </div>
                   </div>
-                  <div className="bg-white/20 p-4 rounded-2xl">
-                    <Users className="h-8 w-8" />
+                  <div className="text-primary-800/20">
+                    <Users className="h-6 w-6" />
                   </div>
                 </div>
               </CardContent>
@@ -323,27 +323,27 @@ export function DashboardClientRedesign({ data }: { data: DashboardData }) {
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {/* Médicos */}
-                  <div className="bg-primary-50 rounded-xl p-6 border-2 border-primary-200">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="p-3 bg-sintegra-blue rounded-lg">
-                        <Stethoscope className="h-6 w-6 text-white" />
+                  <div className="bg-white rounded-lg p-4 border border-gray-200">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="text-sintegra-blue">
+                        <Stethoscope className="h-5 w-5" />
                       </div>
-                      <h4 className="text-lg font-bold text-primary-800">
+                      <h4 className="text-sm font-semibold text-gray-700">
                         Médicos
                       </h4>
                     </div>
-                    <div className="space-y-2">
-                      <p className="text-4xl font-bold text-sintegra-blue">
+                    <div className="space-y-1">
+                      <p className="text-3xl font-bold text-sintegra-blue">
                         {distributionByType.MEDICOS.count}
                       </p>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-xs text-gray-500">
                         {distributionByType.MEDICOS.percentage}% do total
                       </p>
-                      <div className="w-full bg-primary-100 rounded-full h-2">
+                      <div className="w-full bg-gray-200 rounded-full h-1.5 mt-2">
                         <div
-                          className="bg-sintegra-blue h-2 rounded-full transition-all duration-500"
+                          className="bg-sintegra-blue h-1.5 rounded-full transition-all duration-500"
                           style={{ width: `${distributionByType.MEDICOS.percentage}%` }}
                         />
                       </div>
@@ -351,25 +351,25 @@ export function DashboardClientRedesign({ data }: { data: DashboardData }) {
                   </div>
 
                   {/* Distribuidores */}
-                  <div className="bg-primary-100 rounded-xl p-6 border-2 border-primary-300">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="p-3 bg-primary-700 rounded-lg">
-                        <Building2 className="h-6 w-6 text-white" />
+                  <div className="bg-white rounded-lg p-4 border border-gray-200">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="text-primary-700">
+                        <Building2 className="h-5 w-5" />
                       </div>
-                      <h4 className="text-lg font-bold text-primary-900">
+                      <h4 className="text-sm font-semibold text-gray-700">
                         Distribuidores
                       </h4>
                     </div>
-                    <div className="space-y-2">
-                      <p className="text-4xl font-bold text-primary-700">
+                    <div className="space-y-1">
+                      <p className="text-3xl font-bold text-primary-700">
                         {distributionByType.DISTRIBUIDORES.count}
                       </p>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-xs text-gray-500">
                         {distributionByType.DISTRIBUIDORES.percentage}% do total
                       </p>
-                      <div className="w-full bg-primary-200 rounded-full h-2">
+                      <div className="w-full bg-gray-200 rounded-full h-1.5 mt-2">
                         <div
-                          className="bg-primary-700 h-2 rounded-full transition-all duration-500"
+                          className="bg-primary-700 h-1.5 rounded-full transition-all duration-500"
                           style={{ width: `${distributionByType.DISTRIBUIDORES.percentage}%` }}
                         />
                       </div>
@@ -377,25 +377,25 @@ export function DashboardClientRedesign({ data }: { data: DashboardData }) {
                   </div>
 
                   {/* Customizado */}
-                  <div className="bg-secondary-100 rounded-xl p-6 border-2 border-secondary-300">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="p-3 bg-primary-800 rounded-lg">
-                        <Settings2 className="h-6 w-6 text-white" />
+                  <div className="bg-white rounded-lg p-4 border border-gray-200">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="text-primary-800">
+                        <Settings2 className="h-5 w-5" />
                       </div>
-                      <h4 className="text-lg font-bold text-secondary-700">
+                      <h4 className="text-sm font-semibold text-gray-700">
                         Customizado
                       </h4>
                     </div>
-                    <div className="space-y-2">
-                      <p className="text-4xl font-bold text-primary-800">
+                    <div className="space-y-1">
+                      <p className="text-3xl font-bold text-primary-800">
                         {distributionByType.CUSTOM.count}
                       </p>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-xs text-gray-500">
                         {distributionByType.CUSTOM.percentage}% do total
                       </p>
-                      <div className="w-full bg-secondary-200 rounded-full h-2">
+                      <div className="w-full bg-gray-200 rounded-full h-1.5 mt-2">
                         <div
-                          className="bg-primary-800 h-2 rounded-full transition-all duration-500"
+                          className="bg-primary-800 h-1.5 rounded-full transition-all duration-500"
                           style={{ width: `${distributionByType.CUSTOM.percentage}%` }}
                         />
                       </div>
