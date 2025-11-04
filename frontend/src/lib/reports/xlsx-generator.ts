@@ -34,12 +34,12 @@ interface ResponseData {
 
 /**
  * Gera um arquivo Excel (XLSX) a partir das respostas
- * Retorna um Buffer que pode ser enviado como resposta HTTP
+ * Retorna um Uint8Array que pode ser enviado como resposta HTTP
  */
 export function generateReportXLSX(
   responses: ResponseData[],
   reportTitle: string
-): Buffer {
+): Uint8Array {
   // Prepara os dados para o Excel
   const data: any[] = []
 
@@ -130,8 +130,8 @@ export function generateReportXLSX(
     XLSX.utils.book_append_sheet(workbook, statsWorksheet, 'Estatísticas')
   }
 
-  // Converte para buffer
-  const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' })
+  // Converte para Uint8Array (compatível com NextResponse)
+  const buffer = XLSX.write(workbook, { type: 'array', bookType: 'xlsx' }) as Uint8Array
 
   return buffer
 }
