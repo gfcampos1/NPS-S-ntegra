@@ -21,6 +21,8 @@ import {
   ChevronUp,
   LogOut,
   User,
+  Calendar,
+  Database,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -49,6 +51,8 @@ const navItems: NavItem[] = [
 const settingsSubItems: SettingsSubItem[] = [
   { name: "Geral", href: "/admin/settings", icon: Settings },
   { name: "Usuários", href: "/admin/settings/users", icon: UserCog, superAdminOnly: true },
+  { name: "Momentos de Pesquisa", href: "/admin/settings/survey-moments", icon: Calendar, superAdminOnly: true },
+  { name: "Migração de Dados", href: "/admin/settings/data-migration", icon: Database, superAdminOnly: true },
   { name: "Admin Setup", href: "/admin/settings/admin-setup", icon: Wrench, superAdminOnly: true },
 ];
 
