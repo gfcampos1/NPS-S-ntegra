@@ -18,6 +18,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -59,9 +60,12 @@ export function AppLayout({ children }: AppLayoutProps) {
   // Protected routes - with sidebar
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
+      <Sidebar
+        mobileOpen={mobileMenuOpen}
+        onMobileClose={() => setMobileMenuOpen(false)}
+      />
       <main className="flex-1 overflow-auto">
-        <Header />
+        <Header onMobileMenuToggle={() => setMobileMenuOpen(!mobileMenuOpen)} />
         <div className="min-h-screen">
           {children}
         </div>

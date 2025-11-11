@@ -184,12 +184,12 @@ export default function SurveyResponsePage({ params }: { params: { token: string
     switch (question.type) {
       case 'NPS':
         return (
-          <div className="grid grid-cols-6 gap-2">
+          <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
             {Array.from({ length: 11 }, (_, i) => (
               <button
                 key={i}
                 onClick={() => handleAnswer(question.id, i)}
-                className={`aspect-square rounded-lg border-2 text-lg font-bold transition-all ${
+                className={`aspect-square rounded-lg border-2 text-base sm:text-lg font-bold transition-all ${
                   value === i
                     ? 'border-sintegra-blue bg-sintegra-blue text-white scale-110'
                     : 'border-gray-300 hover:border-sintegra-blue hover:scale-105'
@@ -203,12 +203,12 @@ export default function SurveyResponsePage({ params }: { params: { token: string
 
       case 'RATING_1_5':
         return (
-          <div className="grid grid-cols-5 gap-3">
+          <div className="grid grid-cols-5 gap-2 sm:gap-3">
             {Array.from({ length: 5 }, (_, i) => (
               <button
                 key={i}
                 onClick={() => handleAnswer(question.id, i + 1)}
-                className={`aspect-square rounded-lg border-2 text-2xl font-bold transition-all ${
+                className={`aspect-square rounded-lg border-2 text-xl sm:text-2xl font-bold transition-all ${
                   value === i + 1
                     ? 'border-sintegra-blue bg-sintegra-blue text-white scale-110'
                     : 'border-gray-300 hover:border-sintegra-blue hover:scale-105'
@@ -226,12 +226,12 @@ export default function SurveyResponsePage({ params }: { params: { token: string
             ? question.options
             : ['Pior', 'Igual', 'Melhor']
         return (
-          <div className="grid grid-cols-1 gap-3">
+          <div className="grid grid-cols-1 gap-2 sm:gap-3">
             {comparisonOptions.map((option) => (
               <button
                 key={option}
                 onClick={() => handleAnswer(question.id, option)}
-                className={`px-6 py-4 rounded-lg border-2 text-lg font-medium transition-all ${
+                className={`px-4 py-3 sm:px-6 sm:py-4 rounded-lg border-2 text-base sm:text-lg font-medium transition-all ${
                   value === option
                     ? 'border-sintegra-blue bg-sintegra-blue text-white'
                     : 'border-gray-300 hover:border-sintegra-blue'
@@ -250,7 +250,7 @@ export default function SurveyResponsePage({ params }: { params: { token: string
             type="text"
             value={value || ''}
             onChange={(e) => handleAnswer(question.id, e.target.value)}
-            className="w-full px-4 py-3 rounded-lg border-2 border-gray-300 focus:border-sintegra-blue focus:outline-none text-lg"
+            className="w-full px-3 py-2 sm:px-4 sm:py-3 rounded-lg border-2 border-gray-300 focus:border-sintegra-blue focus:outline-none text-base sm:text-lg"
             placeholder="Digite sua resposta..."
           />
         )
@@ -260,14 +260,14 @@ export default function SurveyResponsePage({ params }: { params: { token: string
           <textarea
             value={value || ''}
             onChange={(e) => handleAnswer(question.id, e.target.value)}
-            className="w-full min-h-[120px] px-4 py-3 rounded-lg border-2 border-gray-300 focus:border-sintegra-blue focus:outline-none text-lg resize-none"
+            className="w-full min-h-[120px] px-3 py-2 sm:px-4 sm:py-3 rounded-lg border-2 border-gray-300 focus:border-sintegra-blue focus:outline-none text-base sm:text-lg resize-none"
             placeholder="Digite sua resposta..."
           />
         )
 
       case 'MULTIPLE_CHOICE':
         return (
-          <div className="space-y-3">
+          <div className="space-y-2 sm:space-y-3">
             {question.options?.map((option) => {
               const selected = Array.isArray(value) && value.includes(option)
               return (
@@ -280,7 +280,7 @@ export default function SurveyResponsePage({ params }: { params: { token: string
                       : [...currentValues, option]
                     handleAnswer(question.id, newValues)
                   }}
-                  className={`w-full px-6 py-4 rounded-lg border-2 text-left transition-all ${
+                  className={`w-full px-4 py-3 sm:px-6 sm:py-4 rounded-lg border-2 text-left text-sm sm:text-base transition-all ${
                     selected
                       ? 'border-sintegra-blue bg-sintegra-blue text-white'
                       : 'border-gray-300 hover:border-sintegra-blue'
@@ -295,12 +295,12 @@ export default function SurveyResponsePage({ params }: { params: { token: string
 
       case 'SINGLE_CHOICE':
         return (
-          <div className="space-y-3">
+          <div className="space-y-2 sm:space-y-3">
             {question.options?.map((option) => (
               <button
                 key={option}
                 onClick={() => handleAnswer(question.id, option)}
-                className={`w-full px-6 py-4 rounded-lg border-2 text-left transition-all ${
+                className={`w-full px-4 py-3 sm:px-6 sm:py-4 rounded-lg border-2 text-left text-sm sm:text-base transition-all ${
                   value === option
                     ? 'border-sintegra-blue bg-sintegra-blue text-white'
                     : 'border-gray-300 hover:border-sintegra-blue'
@@ -331,12 +331,12 @@ export default function SurveyResponsePage({ params }: { params: { token: string
   if (isCompleted) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-sintegra-blue to-blue-600 p-4">
-        <Card className="max-w-md w-full p-8 text-center">
-          <CheckCircle className="h-20 w-20 text-green-500 mx-auto mb-6" />
-          <h1 className="text-3xl font-bold text-sintegra-gray-dark mb-4">
+        <Card className="max-w-md w-full p-6 sm:p-8 text-center">
+          <CheckCircle className="h-16 w-16 sm:h-20 sm:w-20 text-green-500 mx-auto mb-4 sm:mb-6" />
+          <h1 className="text-2xl sm:text-3xl font-bold text-sintegra-gray-dark mb-3 sm:mb-4">
             Obrigado!
           </h1>
-          <p className="text-lg text-sintegra-gray-medium mb-2">
+          <p className="text-base sm:text-lg text-sintegra-gray-medium mb-2">
             Sua resposta foi enviada com sucesso.
           </p>
           <p className="text-sm text-sintegra-gray-medium">
@@ -350,9 +350,9 @@ export default function SurveyResponsePage({ params }: { params: { token: string
   if (error || !form) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-        <Card className="max-w-md w-full p-8 text-center">
-          <h1 className="text-2xl font-bold text-red-600 mb-4">Erro</h1>
-          <p className="text-sintegra-gray-medium">{error || 'Formulário não encontrado'}</p>
+        <Card className="max-w-md w-full p-6 sm:p-8 text-center">
+          <h1 className="text-xl sm:text-2xl font-bold text-red-600 mb-4">Erro</h1>
+          <p className="text-sm sm:text-base text-sintegra-gray-medium">{error || 'Formulário não encontrado'}</p>
         </Card>
       </div>
     )
@@ -364,14 +364,14 @@ export default function SurveyResponsePage({ params }: { params: { token: string
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-sintegra-blue to-blue-600 p-4">
-      <div className="max-w-2xl mx-auto py-8">
+      <div className="max-w-2xl mx-auto py-4 sm:py-8">
         {/* Header */}
-        <div className="bg-white rounded-t-2xl p-6 shadow-lg">
-          <h1 className="text-2xl font-bold text-sintegra-gray-dark mb-2">
+        <div className="bg-white rounded-t-2xl p-4 sm:p-6 shadow-lg">
+          <h1 className="text-xl sm:text-2xl font-bold text-sintegra-gray-dark mb-2">
             {form.title}
           </h1>
           {form.description && (
-            <p className="text-sintegra-gray-medium">{form.description}</p>
+            <p className="text-sm sm:text-base text-sintegra-gray-medium">{form.description}</p>
           )}
           <p className="text-sm text-sintegra-gray-medium mt-2">
             Olá, {respondentName}
@@ -387,13 +387,13 @@ export default function SurveyResponsePage({ params }: { params: { token: string
         </div>
 
         {/* Question Card */}
-        <div className="bg-white p-8 shadow-lg min-h-[400px] flex flex-col">
+        <div className="bg-white p-4 sm:p-6 md:p-8 shadow-lg flex flex-col">
           <div className="flex-1">
             <div className="mb-6">
-              <p className="text-sm text-sintegra-gray-medium mb-2">
+              <p className="text-xs sm:text-sm text-sintegra-gray-medium mb-2">
                 Pergunta {currentQuestionIndex + 1} de {form.questions.length}
               </p>
-              <h2 className="text-xl font-semibold text-sintegra-gray-dark mb-2">
+              <h2 className="text-lg sm:text-xl font-semibold text-sintegra-gray-dark mb-2">
                 {currentQuestion.text}
                 {isQuestionRequired(currentQuestion) && (
                   <span className="text-red-500 ml-1">*</span>
@@ -415,18 +415,18 @@ export default function SurveyResponsePage({ params }: { params: { token: string
           </div>
 
           {/* Navigation */}
-          <div className="flex justify-between items-center mt-8 pt-6 border-t">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mt-6 sm:mt-8 pt-4 sm:pt-6 border-t">
             <Button
               variant="outline"
               onClick={handlePrevious}
               disabled={currentQuestionIndex === 0}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 w-full sm:w-auto"
             >
               <ChevronLeft className="h-4 w-4" />
               Anterior
             </Button>
 
-            <p className="text-sm text-sintegra-gray-medium">
+            <p className="text-xs sm:text-sm text-sintegra-gray-medium order-first sm:order-none">
               {Object.keys(answers).length} / {form.questions.length} respondidas
             </p>
 
@@ -434,7 +434,7 @@ export default function SurveyResponsePage({ params }: { params: { token: string
               <Button
                 onClick={handleSubmit}
                 disabled={isSubmitting}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 w-full sm:w-auto"
               >
                 {isSubmitting ? (
                   <>
@@ -449,7 +449,7 @@ export default function SurveyResponsePage({ params }: { params: { token: string
                 )}
               </Button>
             ) : (
-              <Button onClick={handleNext} className="flex items-center gap-2">
+              <Button onClick={handleNext} className="flex items-center gap-2 w-full sm:w-auto">
                 Próxima
                 <ChevronRight className="h-4 w-4" />
               </Button>
@@ -457,7 +457,7 @@ export default function SurveyResponsePage({ params }: { params: { token: string
           </div>
         </div>
 
-        <div className="bg-white rounded-b-2xl p-4 shadow-lg text-center text-xs text-sintegra-gray-medium">
+        <div className="bg-white rounded-b-2xl p-3 sm:p-4 shadow-lg text-center text-xs text-sintegra-gray-medium">
           Suas respostas são salvas automaticamente
         </div>
       </div>

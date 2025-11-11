@@ -1,14 +1,15 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { FileText, Users, BarChart3, LayoutDashboard, MessageSquare, Wrench, UserCog } from "lucide-react";
+import { FileText, Users, BarChart3, LayoutDashboard, MessageSquare, Wrench, UserCog, Menu } from "lucide-react";
 
 interface HeaderProps {
   title?: string;
   subtitle?: string;
+  onMobileMenuToggle?: () => void;
 }
 
-export function Header({ title, subtitle }: HeaderProps) {
+export function Header({ title, subtitle, onMobileMenuToggle }: HeaderProps) {
   const pathname = usePathname();
 
   // Auto-detect title based on route if not provided
@@ -70,16 +71,28 @@ export function Header({ title, subtitle }: HeaderProps) {
 
   return (
     <div className="bg-gradient-to-r from-primary-600 via-primary-700 to-primary-800 shadow-lg">
-      <div className="px-6 py-6">
+      <div className="px-4 py-4 sm:px-6 sm:py-6">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center">
-            {pathname.includes('/forms') && <FileText className="w-5 h-5 text-white" />}
-            {pathname.includes('/respondents') && <Users className="w-5 h-5 text-white" />}
-            {pathname.includes('/feedbacks') && <MessageSquare className="w-5 h-5 text-white" />}
-            {pathname.includes('/reports') && <BarChart3 className="w-5 h-5 text-white" />}
-            {pathname.includes('/dashboard') && <LayoutDashboard className="w-5 h-5 text-white" />}
-            {pathname.includes('/users') && <UserCog className="w-5 h-5 text-white" />}
-            {pathname.includes('/admin-setup') && <Wrench className="w-5 h-5 text-white" />}
+          {/* Mobile Menu Button */}
+          {onMobileMenuToggle && (
+            <button
+              onClick={onMobileMenuToggle}
+              className="lg:hidden p-2 hover:bg-white/10 rounded-lg transition-colors"
+              aria-label="Toggle menu"
+            >
+              <Menu className="w-6 h-6 text-white" />
+            </button>
+          )}
+
+          {/* Icon */}
+          <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center flex-shrink-0">
+            {pathname.includes('/forms') && <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-white" />}
+            {pathname.includes('/respondents') && <Users className="w-4 h-4 sm:w-5 sm:h-5 text-white" />}
+            {pathname.includes('/feedbacks') && <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5 text-white" />}
+            {pathname.includes('/reports') && <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 text-white" />}
+            {pathname.includes('/dashboard') && <LayoutDashboard className="w-4 h-4 sm:w-5 sm:h-5 text-white" />}
+            {pathname.includes('/users') && <UserCog className="w-4 h-4 sm:w-5 sm:h-5 text-white" />}
+            {pathname.includes('/admin-setup') && <Wrench className="w-4 h-4 sm:w-5 sm:h-5 text-white" />}
             {!pathname.includes('/forms') &&
              !pathname.includes('/respondents') &&
              !pathname.includes('/feedbacks') &&
@@ -87,14 +100,16 @@ export function Header({ title, subtitle }: HeaderProps) {
              !pathname.includes('/users') &&
              !pathname.includes('/admin-setup') &&
              !pathname.includes('/dashboard') && (
-              <span className="text-white font-bold text-lg">S</span>
+              <span className="text-white font-bold text-base sm:text-lg">S</span>
             )}
           </div>
-          <div>
-            <h1 className="text-2xl font-bold text-white">
+
+          {/* Title and Subtitle */}
+          <div className="min-w-0 flex-1">
+            <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-white truncate">
               {pageInfo.title}
             </h1>
-            <p className="text-primary-100 text-xs mt-0.5">
+            <p className="text-primary-100 text-xs sm:text-sm mt-0.5 truncate">
               {pageInfo.subtitle}
             </p>
           </div>

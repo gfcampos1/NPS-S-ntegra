@@ -58,10 +58,10 @@ export default async function FormsPage() {
   const forms = await getForms()
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <Link href="/admin/forms/new">
-          <Button>+ Novo Formulário</Button>
+          <Button className="w-full sm:w-auto">+ Novo Formulário</Button>
         </Link>
       </div>
 

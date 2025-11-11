@@ -41,20 +41,20 @@ export default async function RespondentsPage() {
   const respondents = await getRespondents()
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-3xl font-bold text-sintegra-gray-dark">Respondentes</h2>
-          <p className="text-sintegra-gray-medium">
+          <h2 className="text-2xl sm:text-3xl font-bold text-sintegra-gray-dark">Respondentes</h2>
+          <p className="text-sm sm:text-base text-sintegra-gray-medium">
             Gerencie médicos, distribuidores e outros respondentes
           </p>
         </div>
-        <div className="flex gap-3">
-          <Link href="/admin/respondents/import">
-            <Button variant="outline">Importar CSV</Button>
+        <div className="flex gap-2 sm:gap-3 flex-wrap">
+          <Link href="/admin/respondents/import" className="flex-1 sm:flex-none">
+            <Button variant="outline" className="w-full">Importar CSV</Button>
           </Link>
-          <Link href="/admin/respondents/new">
-            <Button>+ Novo Respondente</Button>
+          <Link href="/admin/respondents/new" className="flex-1 sm:flex-none">
+            <Button className="w-full">+ Novo Respondente</Button>
           </Link>
         </div>
       </div>
@@ -118,10 +118,10 @@ export default async function RespondentsPage() {
                 {respondents.map((respondent) => (
                   <div
                     key={respondent.id}
-                    className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                    className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
                   >
-                    <div className="flex-1 space-y-2">
-                      <div className="flex items-center gap-3">
+                    <div className="flex-1 space-y-2 w-full">
+                      <div className="flex flex-wrap items-center gap-2">
                         <h3 className="font-semibold text-sintegra-gray-dark">
                           {respondent.name}
                         </h3>
@@ -179,14 +179,14 @@ export default async function RespondentsPage() {
                       </div>
                     </div>
 
-                    <div className="flex gap-2">
-                      <Link href={`/admin/respondents/${respondent.id}`}>
-                        <Button variant="outline" size="sm">
+                    <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                      <Link href={`/admin/respondents/${respondent.id}`} className="w-full sm:w-auto">
+                        <Button variant="outline" size="sm" className="w-full">
                           Ver Detalhes
                         </Button>
                       </Link>
-                      <Link href={`/admin/respondents/${respondent.id}/edit`}>
-                        <Button size="sm">Editar</Button>
+                      <Link href={`/admin/respondents/${respondent.id}/edit`} className="w-full sm:w-auto">
+                        <Button size="sm" className="w-full">Editar</Button>
                       </Link>
                       <DeleteRespondentButton
                         respondentId={respondent.id}
