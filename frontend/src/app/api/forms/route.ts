@@ -35,6 +35,14 @@ export async function GET(request: NextRequest) {
             responses: true,
           },
         },
+        surveyMoment: {
+          select: {
+            id: true,
+            name: true,
+            color: true,
+            icon: true,
+          },
+        },
       },
       orderBy: {
         createdAt: 'desc',

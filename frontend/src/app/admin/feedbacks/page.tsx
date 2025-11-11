@@ -3,9 +3,17 @@
 import { useEffect, useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { Badge } from '@/components/ui/badge'
 import { Loader2, MessageSquare, FileText, Search, ChevronDown, ChevronRight, Calendar, Users as UsersIcon } from 'lucide-react'
 import { formatDistanceToNow, format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+
+interface SurveyMoment {
+  id: string
+  name: string
+  color: string | null
+  icon: string | null
+}
 
 interface TextQuestion {
   id: string
@@ -14,6 +22,8 @@ interface TextQuestion {
   formId: string
   formTitle: string
   formType: string
+  surveyMomentId: string | null
+  surveyMoment: SurveyMoment | null
   totalResponses: number
   responses: Array<{
     id: string
@@ -34,6 +44,8 @@ interface GroupedForm {
   formId: string
   formTitle: string
   formType: string
+  surveyMomentId: string | null
+  surveyMoment: SurveyMoment | null
   questions: TextQuestion[]
   totalResponses: number
   lastResponseDate: Date | null
@@ -41,16 +53,31 @@ interface GroupedForm {
 
 export default function FeedbacksPage() {
   const [questions, setQuestions] = useState<TextQuestion[]>([])
+  const [moments, setMoments] = useState<SurveyMoment[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [filterType, setFilterType] = useState<'ALL' | 'TEXT_SHORT' | 'TEXT_LONG'>('ALL')
+  const [filterMoment, setFilterMoment] = useState<string>('ALL')
   const [expandedForms, setExpandedForms] = useState<Set<string>>(new Set())
   const [expandedQuestions, setExpandedQuestions] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     fetchTextQuestions()
+    fetchMoments()
   }, [])
+
+  const fetchMoments = async () => {
+    try {
+      const response = await fetch('/api/survey-moments')
+      if (response.ok) {
+        const data = await response.json()
+        setMoments(data)
+      }
+    } catch (err) {
+      console.error('Error loading moments:', err)
+    }
+  }
 
   const fetchTextQuestions = async () => {
     setIsLoading(true)
@@ -79,7 +106,10 @@ export default function FeedbacksPage() {
       const matchesSearch = searchTerm === '' ||
         q.formTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
         q.text.toLowerCase().includes(searchTerm.toLowerCase())
-      return matchesType && matchesSearch
+      const matchesMoment = filterMoment === 'ALL' ||
+        (filterMoment === 'NO_MOMENT' && !q.surveyMomentId) ||
+        q.surveyMomentId === filterMoment
+      return matchesType && matchesSearch && matchesMoment
     })
 
     const grouped = filtered.reduce((acc, question) => {
@@ -106,6 +136,8 @@ export default function FeedbacksPage() {
           formId: question.formId,
           formTitle: question.formTitle,
           formType: question.formType,
+          surveyMomentId: question.surveyMomentId,
+          surveyMoment: question.surveyMoment,
           questions: [question],
           totalResponses: question.totalResponses,
           lastResponseDate: lastDate
@@ -297,6 +329,21 @@ export default function FeedbacksPage() {
               />
             </div>
 
+            {/* Filtro de momento */}
+            <select
+              className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none min-w-[180px]"
+              value={filterMoment}
+              onChange={(e) => setFilterMoment(e.target.value)}
+            >
+              <option value="ALL">Todos os momentos</option>
+              {moments.map(moment => (
+                <option key={moment.id} value={moment.id}>
+                  {moment.name}
+                </option>
+              ))}
+              <option value="NO_MOMENT">Sem momento</option>
+            </select>
+
             {/* Filtro de tipo */}
             <select
               className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
@@ -353,6 +400,17 @@ export default function FeedbacksPage() {
                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 flex-shrink-0">
                               {formTypeLabels[form.formType] || form.formType}
                             </span>
+                            {form.surveyMoment && (
+                              <Badge
+                                style={{
+                                  backgroundColor: form.surveyMoment.color || '#6B7280',
+                                  color: 'white'
+                                }}
+                                className="flex-shrink-0"
+                              >
+                                {form.surveyMoment.name}
+                              </Badge>
+                            )}
                           </div>
 
                           <div className="flex items-center gap-4 mt-1 text-sm text-gray-600">
