@@ -22,6 +22,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Label } from '@/components/ui/label'
 import { Users, Shield, Crown, Eye, ArrowUp, ArrowDown, Trash2, Loader2, KeyRound, Copy, Check } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
@@ -34,6 +42,9 @@ interface User {
   role: 'SUPER_ADMIN' | 'ADMIN' | 'VIEWER'
   createdAt: string
   requirePasswordChange?: boolean
+  _count?: {
+    forms: number
+  }
 }
 
 const roleLabels = {
@@ -72,7 +83,20 @@ export default function UsersPage() {
     tempPassword: ''
   })
   const [copiedPassword, setCopiedPassword] = useState(false)
-  
+  const [transferDialog, setTransferDialog] = useState<{
+    open: boolean
+    userId: string
+    userName: string
+    formsCount: number
+    transferToUserId: string
+  }>({
+    open: false,
+    userId: '',
+    userName: '',
+    formsCount: 0,
+    transferToUserId: '',
+  })
+
   const isSuperAdmin = session?.user?.role === 'SUPER_ADMIN'
 
   useEffect(() => {
@@ -120,13 +144,19 @@ export default function UsersPage() {
     }
   }
 
-  const deleteUser = async (userId: string) => {
+  const deleteUser = async (userId: string, transferFormsToUserId?: string) => {
     setDeletingUserId(userId)
     setError(null)
 
     try {
       const response = await fetch(`/api/users/${userId}`, {
         method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          transferFormsToUserId: transferFormsToUserId || null,
+        }),
       })
 
       if (!response.ok) {
@@ -134,7 +164,23 @@ export default function UsersPage() {
         throw new Error(data.error || 'Erro ao deletar usuário')
       }
 
+      const result = await response.json()
+
+      // Close transfer dialog if open
+      setTransferDialog({
+        open: false,
+        userId: '',
+        userName: '',
+        formsCount: 0,
+        transferToUserId: '',
+      })
+
       await loadUsers()
+
+      // Show success message if available
+      if (result.message) {
+        console.log(result.message)
+      }
     } catch (error: any) {
       console.error('Error deleting user:', error)
       setError(error.message || 'Erro ao deletar usuário')
@@ -442,40 +488,61 @@ export default function UsersPage() {
                               )}
 
                               {/* Deletar - Apenas Super Admin */}
-                              <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    disabled={isUpdating || isDeleting}
-                                    className="border-red-300 hover:bg-red-50"
-                                  >
-                                    <Trash2 className="h-4 w-4 mr-1" />
-                                    Excluir
-                                  </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                  <AlertDialogHeader>
-                                    <AlertDialogTitle>Excluir usuário</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                      Tem certeza que deseja excluir <strong>{user.name}</strong>?
-                                      Esta ação é irreversível e todos os dados associados a este usuário serão removidos.
-                                    </AlertDialogDescription>
-                                  </AlertDialogHeader>
-                                  <AlertDialogFooter>
-                                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                    <AlertDialogAction
-                                      onClick={(e) => {
-                                        e.preventDefault()
-                                        deleteUser(user.id)
-                                      }}
-                                      className="bg-red-600 hover:bg-red-700"
+                              {user._count && user._count.forms > 0 ? (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  disabled={isUpdating || isDeleting}
+                                  className="border-red-300 hover:bg-red-50"
+                                  onClick={() => {
+                                    setTransferDialog({
+                                      open: true,
+                                      userId: user.id,
+                                      userName: user.name,
+                                      formsCount: user._count?.forms || 0,
+                                      transferToUserId: '',
+                                    })
+                                  }}
+                                >
+                                  <Trash2 className="h-4 w-4 mr-1" />
+                                  Excluir
+                                </Button>
+                              ) : (
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      disabled={isUpdating || isDeleting}
+                                      className="border-red-300 hover:bg-red-50"
                                     >
+                                      <Trash2 className="h-4 w-4 mr-1" />
                                       Excluir
-                                    </AlertDialogAction>
-                                  </AlertDialogFooter>
-                                </AlertDialogContent>
-                              </AlertDialog>
+                                    </Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>Excluir usuário</AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        Tem certeza que deseja excluir <strong>{user.name}</strong>?
+                                        Esta ação é irreversível e todos os dados associados a este usuário serão removidos.
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                      <AlertDialogAction
+                                        onClick={(e) => {
+                                          e.preventDefault()
+                                          deleteUser(user.id)
+                                        }}
+                                        className="bg-red-600 hover:bg-red-700"
+                                      >
+                                        Excluir
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
+                              )}
 
                               {(isUpdating || isDeleting) && (
                                 <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
@@ -588,6 +655,85 @@ export default function UsersPage() {
           <div className="flex justify-end">
             <Button onClick={() => setTempPasswordDialog({ open: false, userName: '', tempPassword: '' })}>
               Fechar
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal de Transferência de Formulários */}
+      <Dialog open={transferDialog.open} onOpenChange={(open: boolean) => {
+        setTransferDialog(prev => ({ ...prev, open }))
+      }}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Excluir Usuário com Formulários</DialogTitle>
+            <DialogDescription>
+              O usuário <strong>{transferDialog.userName}</strong> possui <strong>{transferDialog.formsCount}</strong> formulário(s).
+              <br />
+              Selecione um novo proprietário para os formulários antes de excluir.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <Alert className="bg-amber-50 border-amber-200">
+              <AlertDescription className="text-sm">
+                <strong>Atenção:</strong> Esta ação é irreversível. Os formulários serão transferidos para o novo proprietário selecionado.
+              </AlertDescription>
+            </Alert>
+
+            <div className="space-y-2">
+              <Label htmlFor="transfer-user">Novo Proprietário dos Formulários</Label>
+              <Select
+                value={transferDialog.transferToUserId}
+                onValueChange={(value) => setTransferDialog(prev => ({ ...prev, transferToUserId: value }))}
+              >
+                <SelectTrigger id="transfer-user">
+                  <SelectValue placeholder="Selecione um usuário..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {users
+                    .filter(u => u.id !== transferDialog.userId)
+                    .map((user) => (
+                      <SelectItem key={user.id} value={user.id}>
+                        {user.name} ({user.email}) - {roleLabels[user.role]}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="flex gap-3 justify-end">
+            <Button
+              variant="outline"
+              onClick={() => setTransferDialog({
+                open: false,
+                userId: '',
+                userName: '',
+                formsCount: 0,
+                transferToUserId: '',
+              })}
+              disabled={deletingUserId === transferDialog.userId}
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={() => {
+                if (transferDialog.transferToUserId) {
+                  deleteUser(transferDialog.userId, transferDialog.transferToUserId)
+                }
+              }}
+              disabled={!transferDialog.transferToUserId || deletingUserId === transferDialog.userId}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {deletingUserId === transferDialog.userId ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Excluindo...
+                </>
+              ) : (
+                'Transferir e Excluir'
+              )}
             </Button>
           </div>
         </DialogContent>

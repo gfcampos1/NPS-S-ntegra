@@ -14,7 +14,7 @@ import {
   GraduationCap,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { QuestionInsights } from './QuestionInsights'
+import { QuestionCharts } from './QuestionCharts'
 
 type QuestionInsight = {
   id: string
@@ -179,7 +179,7 @@ export function DashboardByMoments({ data }: { data: DashboardData }) {
               </div>
 
               {isExpanded && moment.forms.length > 0 && (
-                <div className="border-t bg-secondary-50/50 p-6 space-y-6">
+                <div className="border-t bg-white p-6 space-y-6">
                   {moment.forms.map((form) => (
                     <div key={form.id} className="space-y-4">
                       <div className="flex items-center justify-between">
@@ -202,7 +202,7 @@ export function DashboardByMoments({ data }: { data: DashboardData }) {
                       </div>
 
                       {form.questions.length > 0 && (
-                        <QuestionInsights questions={form.questions} />
+                        <QuestionCharts questions={form.questions} />
                       )}
                     </div>
                   ))}
@@ -210,7 +210,7 @@ export function DashboardByMoments({ data }: { data: DashboardData }) {
               )}
 
               {isExpanded && moment.forms.length === 0 && (
-                <div className="border-t bg-secondary-50/50 p-6 text-center text-secondary-500">
+                <div className="border-t bg-gray-50 p-6 text-center text-secondary-500">
                   Nenhum formulário neste momento ainda
                 </div>
               )}
@@ -240,12 +240,12 @@ export function DashboardByMoments({ data }: { data: DashboardData }) {
                 key={form.id}
                 className="p-4 bg-white rounded-lg border border-yellow-200"
               >
-                <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center justify-between mb-4">
                   <h4 className="font-semibold text-secondary-900">{form.title}</h4>
                   <Badge variant="outline">{form.totalResponses} respostas</Badge>
                 </div>
                 {form.questions.length > 0 && (
-                  <QuestionInsights questions={form.questions} />
+                  <QuestionCharts questions={form.questions} />
                 )}
               </div>
             ))}
