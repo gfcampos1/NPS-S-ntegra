@@ -12,6 +12,9 @@ export type { LabelProps } from './label';
 
 export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent } from './card';
 
+export { Badge } from './badge';
+export type { BadgeProps } from './badge';
+
 export { ProgressBar } from './ProgressBar';
 export type { ProgressBarProps } from './ProgressBar';
 
