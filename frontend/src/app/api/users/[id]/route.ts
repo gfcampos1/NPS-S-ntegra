@@ -98,6 +98,10 @@ export async function DELETE(
   }
 
   try {
+    // Parse request body to get transferFormsToUserId if provided
+    const body = await request.json().catch(() => ({}))
+    const transferFormsToUserId = body.transferFormsToUserId || null
+
     // Verifica se o usuário existe
     const user = await prisma.user.findUnique({
       where: { id: params.id },
@@ -119,29 +123,73 @@ export async function DELETE(
       )
     }
 
-    // Deleta as relações primeiro (em ordem de dependência)
-    await prisma.$transaction([
+    // Se transferência foi solicitada, verificar se o novo dono existe
+    if (transferFormsToUserId) {
+      const newOwner = await prisma.user.findUnique({
+        where: { id: transferFormsToUserId },
+        select: { id: true, name: true, email: true },
+      })
+
+      if (!newOwner) {
+        return NextResponse.json(
+          { error: 'Usuário destinatário não encontrado' },
+          { status: 404 }
+        )
+      }
+
+      // Não pode transferir para si mesmo
+      if (newOwner.id === params.id) {
+        return NextResponse.json(
+          { error: 'Não é possível transferir formulários para o próprio usuário que será excluído' },
+          { status: 400 }
+        )
+      }
+    }
+
+    // Executar deleção/transferência em transação
+    await prisma.$transaction(async (tx) => {
+      // Se transferência foi solicitada, transferir formulários
+      if (transferFormsToUserId && user._count.forms > 0) {
+        await tx.form.updateMany({
+          where: { createdBy: params.id },
+          data: { createdBy: transferFormsToUserId },
+        })
+      } else {
+        // Caso contrário, deletar formulários
+        await tx.form.deleteMany({
+          where: { createdBy: params.id },
+        })
+      }
+
       // Deleta os audit logs
-      prisma.auditLog.deleteMany({
+      await tx.auditLog.deleteMany({
         where: { userId: params.id },
-      }),
+      })
+
       // Deleta os reports
-      prisma.report.deleteMany({
+      await tx.report.deleteMany({
         where: { generatedBy: params.id },
-      }),
-      // Deleta os forms (que automaticamente deletará questions, responses, etc devido ao cascade)
-      prisma.form.deleteMany({
-        where: { createdBy: params.id },
-      }),
+      })
+
       // Finalmente deleta o usuário
-      prisma.user.delete({
+      await tx.user.delete({
         where: { id: params.id },
-      }),
-    ])
+      })
+    })
+
+    let message = `Usuário removido com sucesso.`
+    if (transferFormsToUserId && user._count.forms > 0) {
+      message += ` ${user._count.forms} formulário(s) transferido(s) para o novo proprietário.`
+    } else if (user._count.forms > 0) {
+      message += ` ${user._count.forms} formulário(s) removido(s).`
+    }
+    if (user._count.reports > 0) {
+      message += ` ${user._count.reports} relatório(s) removido(s).`
+    }
 
     return NextResponse.json({
       success: true,
-      message: `Usuário removido com sucesso. ${user._count.forms} formulários, ${user._count.reports} relatórios e ${user._count.auditLogs} logs foram removidos.`
+      message,
     })
   } catch (error) {
     console.error('Error deleting user:', error)

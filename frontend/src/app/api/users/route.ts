@@ -18,6 +18,8 @@ const sanitizeUser = (user: any) => ({
   email: user.email,
   role: user.role,
   createdAt: user.createdAt,
+  requirePasswordChange: user.requirePasswordChange,
+  _count: user._count,
 })
 
 async function ensureSuperAdmin(request: NextRequest) {
@@ -45,6 +47,13 @@ export async function GET(request: NextRequest) {
 
   const users = await prisma.user.findMany({
     orderBy: { createdAt: 'desc' },
+    include: {
+      _count: {
+        select: {
+          forms: true,
+        },
+      },
+    },
   })
 
   return NextResponse.json(users.map(sanitizeUser))

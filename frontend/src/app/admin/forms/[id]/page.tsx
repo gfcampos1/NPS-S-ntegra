@@ -7,6 +7,7 @@ import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { FileText, Edit, Send, BarChart3, Eye } from 'lucide-react'
 import { FormStatusActions } from '@/components/forms/FormStatusActions'
+import { ChangeMomentButton } from '@/components/forms/ChangeMomentButton'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -22,6 +23,13 @@ async function getForm(id: string) {
         select: {
           name: true,
           email: true,
+        },
+      },
+      surveyMoment: {
+        select: {
+          id: true,
+          name: true,
+          color: true,
         },
       },
       _count: {
@@ -122,7 +130,7 @@ export default async function FormDetailPage({ params }: { params: { id: string 
       </div>
 
       {/* Info Cards */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-5">
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium text-sintegra-gray-medium">
@@ -131,6 +139,21 @@ export default async function FormDetailPage({ params }: { params: { id: string 
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{typeLabels[form.type]}</div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium text-sintegra-gray-medium">
+              Momento
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ChangeMomentButton
+              formId={form.id}
+              currentMomentId={form.surveyMoment?.id || null}
+              currentMomentName={form.surveyMoment?.name || null}
+            />
           </CardContent>
         </Card>
 
