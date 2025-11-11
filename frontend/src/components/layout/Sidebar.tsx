@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -23,6 +23,7 @@ import {
   User,
   Calendar,
   Database,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -38,6 +39,11 @@ interface SettingsSubItem {
   href: string;
   icon: React.ComponentType<{ className?: string }>;
   superAdminOnly?: boolean;
+}
+
+interface SidebarProps {
+  mobileOpen?: boolean;
+  onMobileClose?: () => void;
 }
 
 const navItems: NavItem[] = [
@@ -56,7 +62,7 @@ const settingsSubItems: SettingsSubItem[] = [
   { name: "Admin Setup", href: "/admin/settings/admin-setup", icon: Wrench, superAdminOnly: true },
 ];
 
-export function Sidebar() {
+export function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
   const [settingsExpanded, setSettingsExpanded] = useState(false);
   const pathname = usePathname();
@@ -78,21 +84,49 @@ export function Sidebar() {
     setSettingsExpanded(true);
   }
 
+  // Close mobile menu when route changes
+  useEffect(() => {
+    if (mobileOpen && onMobileClose) {
+      onMobileClose();
+    }
+  }, [pathname]);
+
   const handleSignOut = () => {
     signOut({ callbackUrl: "/login" });
   };
 
+  const handleLinkClick = () => {
+    if (onMobileClose) {
+      onMobileClose();
+    }
+  };
+
   return (
     <>
+      {/* Mobile Overlay */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={onMobileClose}
+        />
+      )}
+
       {/* Sidebar */}
       <motion.aside
         initial={false}
-        animate={{ width: collapsed ? 80 : 280 }}
+        animate={{
+          width: collapsed ? 80 : 280,
+          x: mobileOpen ? 0 : -280
+        }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
         className={cn(
-          "fixed left-0 top-0 h-screen z-40 flex flex-col",
+          "fixed left-0 top-0 h-screen z-50 flex flex-col",
           "bg-white border-r border-gray-200",
-          "shadow-lg"
+          "shadow-lg",
+          // Mobile: Always full width (280px) when open, hidden when closed
+          "lg:translate-x-0 lg:z-40",
+          // Desktop: Normal behavior with collapse
+          !mobileOpen && "max-lg:hidden"
         )}
       >
         {/* Header */}
@@ -134,6 +168,16 @@ export function Sidebar() {
               className="w-10 h-10 rounded-lg object-contain mx-auto"
             />
           )}
+
+          {/* Mobile Close Button */}
+          {mobileOpen && (
+            <button
+              onClick={onMobileClose}
+              className="lg:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <X className="w-5 h-5 text-gray-600" />
+            </button>
+          )}
         </div>
 
         {/* Navigation */}
@@ -148,6 +192,7 @@ export function Sidebar() {
                 <li key={item.href}>
                   <Link
                     href={item.href}
+                    onClick={handleLinkClick}
                     className={cn(
                       "flex items-center gap-3 px-3 py-3 rounded-lg transition-all duration-200",
                       "hover:bg-primary-50",
@@ -218,7 +263,7 @@ export function Sidebar() {
                     const Icon = item.icon;
 
                     return (
-                      <Link key={item.href} href={item.href}>
+                      <Link key={item.href} href={item.href} onClick={handleLinkClick}>
                         <div
                           className={cn(
                             "flex items-center gap-3 px-3 py-2 rounded-lg transition-all",
@@ -279,13 +324,13 @@ export function Sidebar() {
           </button>
         </div>
 
-        {/* Collapse Toggle */}
+        {/* Collapse Toggle - Desktop only */}
         <button
           onClick={() => setCollapsed(!collapsed)}
           className={cn(
-            "absolute -right-3 top-20 w-6 h-6 rounded-full",
+            "hidden lg:flex absolute -right-3 top-20 w-6 h-6 rounded-full",
             "bg-white border-2 border-gray-200",
-            "flex items-center justify-center shadow-md",
+            "items-center justify-center shadow-md",
             "hover:bg-primary-50",
             "transition-colors duration-200"
           )}
@@ -298,10 +343,10 @@ export function Sidebar() {
         </button>
       </motion.aside>
 
-      {/* Spacer for content */}
+      {/* Spacer for content - Desktop only */}
       <div
         style={{ width: collapsed ? 80 : 280 }}
-        className="flex-shrink-0 transition-all duration-300"
+        className="hidden lg:block flex-shrink-0 transition-all duration-300"
       />
     </>
   );
