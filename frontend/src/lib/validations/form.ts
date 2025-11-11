@@ -5,6 +5,7 @@ export const createFormSchema = z.object({
   description: z.string().optional(),
   type: z.enum(['MEDICOS', 'DISTRIBUIDORES', 'CUSTOM']),
   status: z.enum(['DRAFT', 'PUBLISHED', 'PAUSED', 'CLOSED', 'ARCHIVED']).default('DRAFT'),
+  surveyMomentId: z.string().optional().nullable(),
 })
 
 export const updateFormSchema = z.object({
@@ -12,6 +13,7 @@ export const updateFormSchema = z.object({
   description: z.string().optional(),
   type: z.enum(['MEDICOS', 'DISTRIBUIDORES', 'CUSTOM']).optional(),
   status: z.enum(['DRAFT', 'PUBLISHED', 'PAUSED', 'CLOSED', 'ARCHIVED']).optional(),
+  surveyMomentId: z.string().optional().nullable(),
 })
 
 export const createQuestionSchema = z.object({
