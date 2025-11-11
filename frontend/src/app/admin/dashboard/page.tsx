@@ -153,7 +153,7 @@ async function getDashboardData(): Promise<DashboardData> {
     }
 
     const momentData = momentId === 'without-moment' ? null : momentDataMap.get(momentId)!
-    const formsMap = momentId === 'without-moment' ? formsWithoutMomentMap : momentData.forms
+    const formsMap = momentId === 'without-moment' ? formsWithoutMomentMap : momentData!.forms
 
     // Obter ou criar entrada do formulário
     let formEntry = formsMap.get(form.id)
