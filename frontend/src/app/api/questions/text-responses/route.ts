@@ -30,6 +30,15 @@ export async function GET(request: Request) {
             id: true,
             title: true,
             type: true,
+            surveyMomentId: true,
+            surveyMoment: {
+              select: {
+                id: true,
+                name: true,
+                color: true,
+                icon: true,
+              },
+            },
           },
         },
         answers: {
@@ -84,6 +93,8 @@ export async function GET(request: Request) {
       formId: question.form.id,
       formTitle: question.form.title,
       formType: question.form.type,
+      surveyMomentId: question.form.surveyMomentId,
+      surveyMoment: question.form.surveyMoment,
       totalResponses: question.answers.length,
       responses: question.answers.map((answer) => ({
         id: answer.id,

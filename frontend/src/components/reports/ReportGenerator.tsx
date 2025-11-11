@@ -15,6 +15,7 @@ const reportSchema = z.object({
   title: z.string().min(3, 'Título deve ter pelo menos 3 caracteres'),
   description: z.string().optional(),
   formId: z.string().optional(),
+  surveyMomentId: z.string().optional(),
   dateStart: z.string().optional(),
   dateEnd: z.string().optional(),
   respondentType: z.enum(['ALL', 'MEDICO', 'DISTRIBUIDOR']).default('ALL'),
@@ -24,10 +25,18 @@ const reportSchema = z.object({
 
 type ReportFormData = z.infer<typeof reportSchema>
 
+interface SurveyMoment {
+  id: string
+  name: string
+  color: string | null
+  icon: string | null
+}
+
 interface Form {
   id: string
   title: string
   type: string
+  surveyMoment?: SurveyMoment | null
 }
 
 interface ReportGeneratorProps {
@@ -39,6 +48,15 @@ export function ReportGenerator({ forms, onReportGenerated }: ReportGeneratorPro
   const router = useRouter()
   const [isGenerating, setIsGenerating] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // Extrai momentos únicos dos formulários
+  const uniqueMoments = Array.from(
+    new Map(
+      forms
+        .filter(f => f.surveyMoment)
+        .map(f => [f.surveyMoment!.id, f.surveyMoment!])
+    ).values()
+  )
 
   const {
     register,
@@ -74,6 +92,10 @@ export function ReportGenerator({ forms, onReportGenerated }: ReportGeneratorPro
 
       if (data.categories) {
         filters.categories = data.categories.split(',').map((c) => c.trim())
+      }
+
+      if (data.surveyMomentId) {
+        filters.surveyMomentId = data.surveyMomentId
       }
 
       // Faz a requisição
@@ -153,6 +175,24 @@ export function ReportGenerator({ forms, onReportGenerated }: ReportGeneratorPro
 
           {/* Filtros */}
           <div className="grid gap-4 md:grid-cols-2">
+            {/* Momento */}
+            <div className="space-y-2">
+              <Label htmlFor="surveyMomentId">Momento da Pesquisa</Label>
+              <select
+                id="surveyMomentId"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                {...register('surveyMomentId')}
+              >
+                <option value="">Todos os momentos</option>
+                {uniqueMoments.map((moment) => (
+                  <option key={moment.id} value={moment.id}>
+                    {moment.name}
+                  </option>
+                ))}
+                <option value="NO_MOMENT">Sem momento</option>
+              </select>
+            </div>
+
             {/* Formulário */}
             <div className="space-y-2">
               <Label htmlFor="formId">Formulário</Label>
@@ -164,7 +204,7 @@ export function ReportGenerator({ forms, onReportGenerated }: ReportGeneratorPro
                 <option value="">Todos os formulários</option>
                 {forms.map((form) => (
                   <option key={form.id} value={form.id}>
-                    {form.title}
+                    {form.title} {form.surveyMoment ? `(${form.surveyMoment.name})` : ''}
                   </option>
                 ))}
               </select>

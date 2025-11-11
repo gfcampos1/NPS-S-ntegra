@@ -6,11 +6,19 @@ import { ReportsList } from '@/components/reports/ReportsList'
 import { Card, CardContent } from '@/components/ui/card'
 import { Loader2, TrendingUp } from 'lucide-react'
 
+interface SurveyMoment {
+  id: string
+  name: string
+  color: string | null
+  icon: string | null
+}
+
 interface Form {
   id: string
   title: string
   type: string
   status: string
+  surveyMoment?: SurveyMoment | null
 }
 
 interface Report {
