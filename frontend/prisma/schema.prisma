@@ -86,6 +86,35 @@ enum RespondentType {
 }
 
 // ==========================================
+// MOMENTOS DE PESQUISA
+// ==========================================
+
+model SurveyMoment {
+  id            String    @id @default(cuid())
+  name          String    // Ex: "Satisfação e Pós-Mercado"
+  description   String?   // Descrição do momento
+  slug          String    @unique // URL-friendly: "satisfacao-pos-mercado"
+  color         String?   // Cor para identificação visual (#hex)
+  icon          String?   // Nome do ícone (lucide-react)
+  order         Int       @default(0) // Ordem de exibição
+
+  // Status
+  isActive      Boolean   @default(true)
+
+  // Timestamps
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relações
+  forms         Form[]
+
+  @@index([slug])
+  @@index([isActive])
+  @@index([order])
+  @@map("survey_moments")
+}
+
+// ==========================================
 // FORMULÁRIOS
 // ==========================================
 
@@ -94,35 +123,40 @@ model Form {
   title         String
   description   String?
   type          FormType
-  
+
   // Configurações
   status        FormStatus  @default(DRAFT)
-  
+
+  // Momento de Pesquisa
+  surveyMomentId String?
+  surveyMoment   SurveyMoment? @relation(fields: [surveyMomentId], references: [id], onDelete: SetNull)
+
   // Aparência
   welcomeTitle  String?     // Título da tela de boas-vindas
   welcomeText   String?     // Texto explicativo inicial
   thankYouTitle String?     // "Obrigado pela participação!"
   thankYouText  String?
-  
+
   // Distribuição
   expiresAt     DateTime?   // Data de expiração
   maxResponses  Int?        // Limite de respostas
-  
+
   // Metadados
   createdBy     String
   creator       User        @relation(fields: [createdBy], references: [id])
-  
+
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
   publishedAt   DateTime?
-  
+
   // Relações
   questions     Question[]
   responses     Response[]
-  
+
   @@index([type])
   @@index([status])
   @@index([createdBy])
+  @@index([surveyMomentId])
   @@map("forms")
 }
 

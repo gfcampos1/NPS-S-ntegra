@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -12,10 +12,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 
+type SurveyMoment = {
+  id: string
+  name: string
+  description: string | null
+  color: string | null
+}
+
 export default function NewFormPage() {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const [moments, setMoments] = useState<SurveyMoment[]>([])
+  const [loadingMoments, setLoadingMoments] = useState(true)
 
   const {
     register,
@@ -28,6 +37,24 @@ export default function NewFormPage() {
       type: 'CUSTOM',
     },
   })
+
+  useEffect(() => {
+    loadMoments()
+  }, [])
+
+  const loadMoments = async () => {
+    try {
+      const response = await fetch('/api/survey-moments')
+      if (response.ok) {
+        const data = await response.json()
+        setMoments(data)
+      }
+    } catch (error) {
+      console.error('Erro ao carregar momentos:', error)
+    } finally {
+      setLoadingMoments(false)
+    }
+  }
 
   const onSubmit = async (data: CreateFormInput) => {
     setIsSubmitting(true)
@@ -126,6 +153,31 @@ export default function NewFormPage() {
               </select>
               {errors.type && (
                 <p className="text-sm text-red-500">{errors.type.message}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="surveyMomentId">
+                Momento de Pesquisa
+              </Label>
+              <select
+                id="surveyMomentId"
+                {...register('surveyMomentId')}
+                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sintegra-blue"
+                disabled={loadingMoments}
+              >
+                <option value="">Sem categoria (selecione depois)</option>
+                {moments.map((moment) => (
+                  <option key={moment.id} value={moment.id}>
+                    {moment.name}
+                  </option>
+                ))}
+              </select>
+              <p className="text-xs text-secondary-500">
+                Organize seu formulário por momento/contexto de pesquisa
+              </p>
+              {errors.surveyMomentId && (
+                <p className="text-sm text-red-500">{errors.surveyMomentId.message}</p>
               )}
             </div>
 
