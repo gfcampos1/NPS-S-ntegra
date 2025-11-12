@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import { Loading } from '../ui/Loading';
+import { SidebarProvider, useSidebar } from '@/contexts/SidebarContext';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -13,12 +14,12 @@ interface AppLayoutProps {
 
 const staticPublicRoutes = ['/login', '/'];
 
-export function AppLayout({ children }: AppLayoutProps) {
+function AppLayoutContent({ children }: AppLayoutProps) {
   const { data: session, status } = useSession();
   const pathname = usePathname();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { mobileOpen, setMobileOpen } = useSidebar();
 
   useEffect(() => {
     setMounted(true);
@@ -60,16 +61,21 @@ export function AppLayout({ children }: AppLayoutProps) {
   // Protected routes - with sidebar
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <Sidebar
-        mobileOpen={mobileMenuOpen}
-        onMobileClose={() => setMobileMenuOpen(false)}
-      />
+      <Sidebar />
       <main className="flex-1 overflow-auto">
-        <Header onMobileMenuToggle={() => setMobileMenuOpen(!mobileMenuOpen)} />
+        <Header onMobileMenuToggle={() => setMobileOpen(!mobileOpen)} />
         <div className="min-h-screen">
           {children}
         </div>
       </main>
     </div>
+  );
+}
+
+export function AppLayout({ children }: AppLayoutProps) {
+  return (
+    <SidebarProvider>
+      <AppLayoutContent>{children}</AppLayoutContent>
+    </SidebarProvider>
   );
 }
