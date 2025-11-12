@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { PasswordChangeGuard } from '@/components/PasswordChangeGuard'
 import { Sidebar } from '@/components/layout/Sidebar'
-import { SidebarProvider, useSidebar } from '@/contexts/SidebarContext'
+import { useSidebar } from '@/contexts/SidebarContext'
 import { Menu } from 'lucide-react'
 
 function AdminLayoutContent({ children }: { children: React.ReactNode }) {
@@ -62,11 +62,9 @@ export default function AdminLayout({
 
   return (
     <PasswordChangeGuard>
-      <SidebarProvider>
-        <div className="bg-gray-50">
-          <AdminLayoutContent>{children}</AdminLayoutContent>
-        </div>
-      </SidebarProvider>
+      <div className="bg-gray-50">
+        <AdminLayoutContent>{children}</AdminLayoutContent>
+      </div>
     </PasswordChangeGuard>
   )
 }

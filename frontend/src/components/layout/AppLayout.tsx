@@ -54,11 +54,14 @@ function AppLayoutContent({ children }: AppLayoutProps) {
   const isPublicRoute =
     staticPublicRoutes.includes(pathname) || (pathname?.startsWith('/r/') ?? false);
 
-  if (isPublicRoute) {
+  // Admin routes use their own layout with sidebar
+  const isAdminRoute = pathname?.startsWith('/admin') ?? false;
+
+  if (isPublicRoute || isAdminRoute) {
     return <>{children}</>;
   }
 
-  // Protected routes - with sidebar
+  // Other protected routes - with sidebar and header
   return (
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar />
