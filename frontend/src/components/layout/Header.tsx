@@ -77,7 +77,7 @@ export function Header({ title, subtitle, onMobileMenuToggle }: HeaderProps) {
           {onMobileMenuToggle && (
             <button
               onClick={onMobileMenuToggle}
-              className="lg:hidden p-2 hover:bg-white/10 rounded-lg transition-colors"
+              className="lg:hidden touch-target hover:bg-white/10 rounded-lg transition-colors"
               aria-label="Toggle menu"
             >
               <Menu className="w-6 h-6 text-white" />
@@ -109,7 +109,7 @@ export function Header({ title, subtitle, onMobileMenuToggle }: HeaderProps) {
             <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-white truncate">
               {pageInfo.title}
             </h1>
-            <p className="text-primary-100 text-xs sm:text-sm mt-0.5 truncate">
+            <p className="text-primary-100 text-caption-mobile mt-0.5 truncate">
               {pageInfo.subtitle}
             </p>
           </div>

@@ -85,19 +85,19 @@ export default async function RespondentsPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-4 md:grid-cols-3">
+              <div className="grid gap-4 sm:grid-cols-3">
                 <div className="space-y-1">
-                  <p className="text-sm text-sintegra-gray-medium">Total</p>
+                  <p className="text-mobile text-sintegra-gray-medium">Total</p>
                   <p className="text-2xl font-bold">{respondents.length}</p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-sm text-sintegra-gray-medium">Médicos</p>
+                  <p className="text-mobile text-sintegra-gray-medium">Médicos</p>
                   <p className="text-2xl font-bold">
                     {respondents.filter((r) => r.type === 'MEDICO').length}
                   </p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-sm text-sintegra-gray-medium">Distribuidores</p>
+                  <p className="text-mobile text-sintegra-gray-medium">Distribuidores</p>
                   <p className="text-2xl font-bold">
                     {respondents.filter((r) => r.type === 'DISTRIBUIDOR').length}
                   </p>
@@ -139,32 +139,32 @@ export default async function RespondentsPage() {
                         )}
                       </div>
                       
-                      <div className="grid gap-2 md:grid-cols-3 text-sm text-sintegra-gray-medium">
-                        <div className="flex items-center gap-2">
-                          <Mail className="h-4 w-4" />
-                          <span>{respondent.email}</span>
+                      <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3 text-mobile text-sintegra-gray-medium">
+                        <div className="flex items-center gap-2 overflow-hidden">
+                          <Mail className="h-4 w-4 flex-shrink-0" />
+                          <span className="truncate">{respondent.email}</span>
                         </div>
                         {respondent.phone && (
                           <div className="flex items-center gap-2">
-                            <Phone className="h-4 w-4" />
+                            <Phone className="h-4 w-4 flex-shrink-0" />
                             <span>{respondent.phone}</span>
                           </div>
                         )}
                         {respondent.region && (
                           <div className="flex items-center gap-2">
-                            <MapPin className="h-4 w-4" />
+                            <MapPin className="h-4 w-4 flex-shrink-0" />
                             <span>{respondent.region}</span>
                           </div>
                         )}
                       </div>
 
                       {respondent.specialty && (
-                        <div className="text-sm text-sintegra-gray-medium">
+                        <div className="text-mobile text-sintegra-gray-medium">
                           Especialidade: {respondent.specialty}
                         </div>
                       )}
 
-                      <div className="flex items-center gap-4 text-xs text-sintegra-gray-medium">
+                      <div className="flex items-center gap-4 text-caption-mobile text-sintegra-gray-medium">
                         <div className="flex items-center gap-1">
                           <FileText className="h-3 w-3" />
                           <span>{respondent._count.responses} respostas</span>
@@ -179,20 +179,22 @@ export default async function RespondentsPage() {
                       </div>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                      <Link href={`/admin/respondents/${respondent.id}`} className="w-full sm:w-auto">
+                    <div className="button-group-mobile w-full sm:w-auto">
+                      <Link href={`/admin/respondents/${respondent.id}`} className="flex-1 sm:flex-initial">
                         <Button variant="outline" size="sm" className="w-full">
-                          Ver Detalhes
+                          Ver
                         </Button>
                       </Link>
-                      <Link href={`/admin/respondents/${respondent.id}/edit`} className="w-full sm:w-auto">
+                      <Link href={`/admin/respondents/${respondent.id}/edit`} className="flex-1 sm:flex-initial">
                         <Button size="sm" className="w-full">Editar</Button>
                       </Link>
-                      <DeleteRespondentButton
-                        respondentId={respondent.id}
-                        respondentName={respondent.name}
-                        hasResponses={respondent._count.responses > 0}
-                      />
+                      <div className="flex-1 sm:flex-initial">
+                        <DeleteRespondentButton
+                          respondentId={respondent.id}
+                          respondentName={respondent.name}
+                          hasResponses={respondent._count.responses > 0}
+                        />
+                      </div>
                     </div>
                   </div>
                 ))}

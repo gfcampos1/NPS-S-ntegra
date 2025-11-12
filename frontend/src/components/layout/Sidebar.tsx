@@ -151,7 +151,7 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
                   <h1 className="font-bold text-lg text-secondary-900">
                     Síntegra
                   </h1>
-                  <p className="text-xs text-secondary-500">
+                  <p className="text-caption-mobile text-secondary-500">
                     NPS System
                   </p>
                 </div>
@@ -173,7 +173,7 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
           {mobileOpen && (
             <button
               onClick={onMobileClose}
-              className="lg:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="lg:hidden touch-target hover:bg-gray-100 rounded-lg transition-colors"
             >
               <X className="w-5 h-5 text-gray-600" />
             </button>
@@ -229,7 +229,7 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
             <button
               onClick={() => !collapsed && setSettingsExpanded(!settingsExpanded)}
               className={cn(
-                "w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all",
+                "w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-all",
                 "hover:bg-secondary-100",
                 "text-secondary-700",
                 isOnSettingsPage && "bg-secondary-100"
@@ -266,7 +266,7 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
                       <Link key={item.href} href={item.href} onClick={handleLinkClick}>
                         <div
                           className={cn(
-                            "flex items-center gap-3 px-3 py-2 rounded-lg transition-all",
+                            "flex items-center gap-3 px-3 py-3 rounded-lg transition-all",
                             "hover:bg-secondary-50",
                             isActive
                               ? "bg-gradient-sintegra text-white shadow-sm"
@@ -300,7 +300,7 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
                   <p className="text-sm font-semibold text-secondary-900 truncate">
                     {session.user.name}
                   </p>
-                  <p className="text-xs text-secondary-500">
+                  <p className="text-caption-mobile text-secondary-500">
                     {(session.user as any).role === "SUPER_ADMIN"
                       ? "Super Admin"
                       : "Administrador"}
@@ -314,7 +314,7 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
           <button
             onClick={handleSignOut}
             className={cn(
-              "w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all",
+              "w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-all",
               "hover:bg-red-50",
               "text-red-600"
             )}

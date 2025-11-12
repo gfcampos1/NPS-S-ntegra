@@ -4,6 +4,15 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { ChevronLeft, ChevronRight, CheckCircle, Loader2 } from 'lucide-react'
 
 type Question = {
@@ -38,6 +47,8 @@ export default function SurveyResponsePage({ params }: { params: { token: string
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isCompleted, setIsCompleted] = useState(false)
+  const [alertOpen, setAlertOpen] = useState(false)
+  const [alertMessage, setAlertMessage] = useState('')
 
   useEffect(() => {
     fetchForm()
@@ -137,7 +148,8 @@ export default function SurveyResponsePage({ params }: { params: { token: string
     const currentQuestion = form.questions[currentQuestionIndex]
 
     if (isQuestionRequired(currentQuestion) && !answers[currentQuestion.id]) {
-      alert('Esta pergunta é obrigatória')
+      setAlertMessage('Esta pergunta é obrigatória')
+      setAlertOpen(true)
       return
     }
 
@@ -161,20 +173,22 @@ export default function SurveyResponsePage({ params }: { params: { token: string
     )
 
     if (unansweredRequired.length > 0) {
-      alert(`Por favor, responda todas as perguntas obrigatórias (${unansweredRequired.length} restantes)`)
+      setAlertMessage(`Por favor, responda todas as perguntas obrigatórias (${unansweredRequired.length} restantes)`)
+      setAlertOpen(true)
       return
     }
 
     setIsSubmitting(true)
-    
+
     const success = await saveProgress(answers, true)
-    
+
     if (success) {
       setIsCompleted(true)
     } else {
-      alert('Erro ao enviar respostas. Tente novamente.')
+      setAlertMessage('Erro ao enviar respostas. Tente novamente.')
+      setAlertOpen(true)
     }
-    
+
     setIsSubmitting(false)
   }
 
@@ -363,8 +377,25 @@ export default function SurveyResponsePage({ params }: { params: { token: string
   const isLastQuestion = currentQuestionIndex === form.questions.length - 1
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sintegra-blue to-blue-600 p-4">
-      <div className="max-w-2xl mx-auto py-4 sm:py-8">
+    <>
+      <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
+        <AlertDialogContent className="max-w-[90vw] sm:max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-base sm:text-lg">Aviso</AlertDialogTitle>
+            <AlertDialogDescription className="text-sm sm:text-base">
+              {alertMessage}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction className="w-full sm:w-auto touch-target">
+              Entendi
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <div className="min-h-screen bg-gradient-to-br from-sintegra-blue to-blue-600 p-4">
+        <div className="max-w-2xl mx-auto py-4 sm:py-8">
         {/* Header */}
         <div className="bg-white rounded-t-2xl p-4 sm:p-6 shadow-lg">
           <h1 className="text-xl sm:text-2xl font-bold text-sintegra-gray-dark mb-2">
@@ -460,7 +491,8 @@ export default function SurveyResponsePage({ params }: { params: { token: string
         <div className="bg-white rounded-b-2xl p-3 sm:p-4 shadow-lg text-center text-xs text-sintegra-gray-medium">
           Suas respostas são salvas automaticamente
         </div>
+        </div>
       </div>
-    </div>
+    </>
   )
 }

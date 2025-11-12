@@ -98,19 +98,19 @@ export default async function FormsPage() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center justify-between text-mobile">
                   <span className="text-sintegra-gray-medium">Tipo:</span>
                   <span className="font-medium">{typeLabels[form.type]}</span>
                 </div>
-                <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center justify-between text-mobile">
                   <span className="text-sintegra-gray-medium">Perguntas:</span>
                   <span className="font-medium">{form._count.questions}</span>
                 </div>
-                <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center justify-between text-mobile">
                   <span className="text-sintegra-gray-medium">Respostas:</span>
                   <span className="font-medium">{form._count.responses}</span>
                 </div>
-                <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center justify-between text-caption-mobile">
                   <span className="text-sintegra-gray-medium">Criado:</span>
                   <span className="font-medium">
                     {formatDistanceToNow(new Date(form.createdAt), {
@@ -119,22 +119,24 @@ export default async function FormsPage() {
                     })}
                   </span>
                 </div>
-                <div className="pt-4 flex gap-2">
-                  <Link href={`/admin/forms/${form.id}`} className="flex-1">
+                <div className="pt-4 button-group-mobile">
+                  <Link href={`/admin/forms/${form.id}`} className="flex-1 sm:flex-initial">
                     <Button variant="outline" className="w-full" size="sm">
-                      Ver Detalhes
+                      Ver
                     </Button>
                   </Link>
-                  <Link href={`/admin/forms/${form.id}/edit`} className="flex-1">
+                  <Link href={`/admin/forms/${form.id}/edit`} className="flex-1 sm:flex-initial">
                     <Button className="w-full" size="sm">
                       Editar
                     </Button>
                   </Link>
-                  <DeleteFormButton 
-                    formId={form.id} 
-                    formTitle={form.title}
-                    hasResponses={form._count.responses > 0}
-                  />
+                  <div className="flex-1 sm:flex-initial">
+                    <DeleteFormButton
+                      formId={form.id}
+                      formTitle={form.title}
+                      hasResponses={form._count.responses > 0}
+                    />
+                  </div>
                 </div>
               </CardContent>
             </Card>

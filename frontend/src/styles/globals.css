@@ -87,11 +87,11 @@ body {
   .text-balance {
     text-wrap: balance;
   }
-  
+
   .container-padding {
     @apply px-4 sm:px-6 lg:px-8;
   }
-  
+
   .section-padding {
     @apply py-12 sm:py-16 lg:py-20;
   }
@@ -106,7 +106,7 @@ body {
   }
 
   .bg-gradient-sintegra-reverse {
-    background: linear-gradient(135deg, #2B5C9E 0%, #4DB5E8 100%);
+    background: linear-gradient(135deg, #2B5C9E 0%, #4DB5C9E 100%);
   }
 
   /* Hover effects Síntegra */
@@ -117,6 +117,83 @@ body {
   .hover-sintegra:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 16px rgba(45, 92, 158, 0.2);
+  }
+
+  /* ===== MOBILE UX UTILITIES ===== */
+
+  /* Touch Targets - Mínimo 44x44px para mobile */
+  .touch-target {
+    min-width: 44px;
+    min-height: 44px;
+    @apply flex items-center justify-center;
+  }
+
+  .touch-target-sm {
+    min-width: 40px;
+    min-height: 40px;
+    @apply flex items-center justify-center;
+  }
+
+  /* Typography Responsiva - Mobile First */
+  .text-mobile {
+    @apply text-sm sm:text-base; /* 14px mobile, 16px desktop */
+  }
+
+  .text-mobile-lg {
+    @apply text-base sm:text-lg; /* 16px mobile, 18px desktop */
+  }
+
+  .text-label-mobile {
+    @apply text-sm sm:text-sm; /* 14px sempre (legível) */
+  }
+
+  .text-caption-mobile {
+    @apply text-xs sm:text-sm; /* 12px mobile, 14px desktop */
+  }
+
+  /* Layout Mobile */
+  .stack-mobile {
+    @apply flex flex-col sm:flex-row;
+  }
+
+  .stack-mobile-reverse {
+    @apply flex flex-col-reverse sm:flex-row;
+  }
+
+  /* Button Groups */
+  .button-group-mobile {
+    @apply flex flex-col sm:flex-row gap-2 sm:gap-3;
+  }
+
+  .button-group-mobile-full {
+    @apply flex flex-col sm:flex-row gap-2 sm:gap-3 w-full;
+  }
+
+  /* Card Stacking */
+  .card-stack-mobile {
+    @apply space-y-3 sm:space-y-0 sm:grid sm:gap-4;
+  }
+
+  /* Padding Mobile */
+  .p-mobile {
+    @apply p-4 sm:p-6;
+  }
+
+  .px-mobile {
+    @apply px-4 sm:px-6;
+  }
+
+  .py-mobile {
+    @apply py-4 sm:py-6;
+  }
+
+  /* Gap Mobile */
+  .gap-mobile {
+    @apply gap-3 sm:gap-4;
+  }
+
+  .gap-mobile-sm {
+    @apply gap-2 sm:gap-3;
   }
 }
 
