@@ -116,17 +116,16 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
         initial={false}
         animate={{
           width: collapsed ? 80 : 280,
-          x: mobileOpen ? 0 : -280
         }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
         className={cn(
           "fixed left-0 top-0 h-screen z-50 flex flex-col",
           "bg-white border-r border-gray-200",
           "shadow-lg",
-          // Mobile: Always full width (280px) when open, hidden when closed
-          "lg:translate-x-0 lg:z-40",
-          // Desktop: Normal behavior with collapse
-          !mobileOpen && "max-lg:hidden"
+          // Desktop: Always visible
+          "hidden lg:flex",
+          // Mobile: Show/hide based on mobileOpen
+          mobileOpen && "!flex"
         )}
       >
         {/* Header */}
