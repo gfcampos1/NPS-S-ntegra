@@ -26,6 +26,7 @@ import {
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useSidebar } from "@/contexts/SidebarContext";
 
 interface NavItem {
   name: string;
@@ -39,11 +40,6 @@ interface SettingsSubItem {
   href: string;
   icon: React.ComponentType<{ className?: string }>;
   superAdminOnly?: boolean;
-}
-
-interface SidebarProps {
-  mobileOpen?: boolean;
-  onMobileClose?: () => void;
 }
 
 const navItems: NavItem[] = [
@@ -62,8 +58,8 @@ const settingsSubItems: SettingsSubItem[] = [
   { name: "Admin Setup", href: "/admin/settings/admin-setup", icon: Wrench, superAdminOnly: true },
 ];
 
-export function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
-  const [collapsed, setCollapsed] = useState(false);
+export function Sidebar() {
+  const { collapsed, setCollapsed, mobileOpen, setMobileOpen } = useSidebar();
   const [settingsExpanded, setSettingsExpanded] = useState(false);
   const pathname = usePathname();
   const { data: session } = useSession();
@@ -86,8 +82,8 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
 
   // Close mobile menu when route changes
   useEffect(() => {
-    if (mobileOpen && onMobileClose) {
-      onMobileClose();
+    if (mobileOpen) {
+      setMobileOpen(false);
     }
   }, [pathname]);
 
@@ -96,8 +92,8 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
   };
 
   const handleLinkClick = () => {
-    if (onMobileClose) {
-      onMobileClose();
+    if (mobileOpen) {
+      setMobileOpen(false);
     }
   };
 
@@ -107,7 +103,7 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
       {mobileOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
-          onClick={onMobileClose}
+          onClick={() => setMobileOpen(false)}
         />
       )}
 
@@ -171,7 +167,7 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
           {/* Mobile Close Button */}
           {mobileOpen && (
             <button
-              onClick={onMobileClose}
+              onClick={() => setMobileOpen(false)}
               className="lg:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <X className="w-5 h-5 text-gray-600" />
@@ -341,12 +337,6 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
           )}
         </button>
       </motion.aside>
-
-      {/* Spacer for content - Desktop only */}
-      <div
-        style={{ width: collapsed ? 80 : 280 }}
-        className="hidden lg:block flex-shrink-0 transition-all duration-300"
-      />
     </>
   );
 }
